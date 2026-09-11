@@ -2,32 +2,28 @@ const Pitch = require('./../models/PitchModel')
 
 
 exports.create = async (data) => {
-    const newPitch = await Pitch.create(data)
-
-    return newPitch
+    return Pitch.create(data)
 }
 
 exports.findAll = async () => {
-    const pitchs = await Pitch.find()
-
-    return pitchs
+    return Pitch.find()
 }
 
-
 exports.findById = async (id) => {
-    const pitch = await Pitch.findById(id)
-
-    return pitch
+    return Pitch.findById(id)
 }
 
 exports.update = async (id, data) => {
-    const newPitch = await Pitch.findByIdAndUpdate(id, data, {
-        returnDocument: 'after'
-    })
+    const pitch = await Pitch.findById(id)
 
-    return newPitch
+    if (!pitch) {
+        return null
+    }
+
+    Object.assign(pitch, data)
+    return pitch.save()
 }
 
 exports.delete = async (id) => {
-    await Pitch.findByIdAndDelete(id)
+    return Pitch.findByIdAndDelete(id)
 }

@@ -1,70 +1,84 @@
 const pitchServices = require('./../service/PitchServices')
-const Pitch = require('./../models/PitchModel')
+
+const sendError = (res, err) => {
+    const statusCode = err.name === 'ValidationError' || err.name === 'CastError' ? 400 : 500
+
+    return res.status(statusCode).json({
+        status: 'error',
+        message: err.message
+    })
+}
 
 exports.createPitch = async (req, res) => {
     try {
-        await pitchServices.createPitch(req.body)
+        const pitch = await pitchServices.createPitch(req.body)
 
         res.status(201).json({
-            status: 'created ....'
+            status: 'created',
+            data: pitch
         })
     } catch (err) {
-        res.status(404).json(
-            console.log(err)
-        )
+        sendError(res, err)
     }
-
 }
 
 exports.getAllPitches = async (req, res) => {
     try {
-        // console.log(1)
-        const pitchs = await pitchServices.findAllPitches(req.body)
-        
-        res.status(201).json(pitchs)    
+        const pitches = await pitchServices.findAllPitches()
+
+        res.status(200).json({
+            status: 'success',
+            data: pitches
+        })
     } catch (err) {
-        res.status(404).json(
-            console.log(err)
-        )
+        sendError(res, err)
     }
 }
 
 exports.getPitchById = async (req, res) => {
     try {
         const pitch = await pitchServices.findPitchById(req.params.id)
-        
-        res.status(201).json(pitch)
+
+        if (!pitch) {
+            return res.status(404).json({ status: 'not found' })
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: pitch
+        })
     } catch (err) {
-        res.status(404).json(
-            console.log(err)
-        )
-    } 
+        sendError(res, err)
+    }
 }
 
 exports.updatePitch = async (req, res) => {
     try {
-        await pitchServices.updatePitch(req.params.id, req.body)
-        
-        res.status(201).json({
-            status: 'updated ...'
+        const pitch = await pitchServices.updatePitch(req.params.id, req.body)
+
+        if (!pitch) {
+            return res.status(404).json({ status: 'not found' })
+        }
+
+        res.status(200).json({
+            status: 'updated',
+            data: pitch
         })
     } catch (err) {
-        res.status(404).json(
-            console.log(err)
-        )
-    } 
+        sendError(res, err)
+    }
 }
 
 exports.deletePitch = async (req, res) => {
     try {
-        await pitchServices.deletePitch(req.params.id)
-        
-        res.status(201).json({
-            status: 'deleted ...'
-        })
+        const pitch = await pitchServices.deletePitch(req.params.id)
+
+        if (!pitch) {
+            return res.status(404).json({ status: 'not found' })
+        }
+
+        res.status(204).send()
     } catch (err) {
-        res.status(404).json(
-            console.log(err)
-        )
-    } 
+        sendError(res, err)
+    }
 }

@@ -1,29 +1,21 @@
 const pitchRepository = require('./../repositories/PitchRepository')
 
 exports.createPitch = async (data) => {
-    const newPitch = await pitchRepository.create(data)
-
-    return newPitch
+    return pitchRepository.create(data)
 }
 
 exports.findAllPitches = async () => {
-    const pitchs = await pitchRepository.findAll()
-
-    return pitchs
+    return pitchRepository.findAll()
 }
 
 exports.findPitchById = async (id) => {
-    const pitch = pitchRepository.findById(id)
-
-    return pitch
+    return pitchRepository.findById(id)
 }
 
-exports.updatePitch = async (data) => {
-    await pitchRepository.update(data)
+exports.updatePitch = async (id, data) => {
+    return pitchRepository.update(id, data)
 }
 
 exports.deletePitch = async (id) => {
-    await pitchRepository.delete(id)
+    return pitchRepository.delete(id)
 }
-
-
