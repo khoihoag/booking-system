@@ -10,7 +10,7 @@ const timeSlotRouter = require('./routes/TimeSlotRouter')
 app.use(express.json())
 app.use(morgan('dev'))
 
-app.use('/api/field', fieldRouter)
+app.use('/api/pitch', fieldRouter)
 app.use('/api/timeSlot', timeSlotRouter)
 
 

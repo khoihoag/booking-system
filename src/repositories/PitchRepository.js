@@ -7,20 +7,20 @@ exports.create = async (data) => {
     return newPitch
 }
 
-exports.findAllPitchs = async () => {
+exports.findAll = async () => {
     const pitchs = await Pitch.find()
 
     return pitchs
 }
 
 
-exports.findPitch = async (id) => {
+exports.findById = async (id) => {
     const pitch = await Pitch.findById(id)
 
     return pitch
 }
 
-exports.updatePitch = async (id, data) => {
+exports.update = async (id, data) => {
     const newPitch = await Pitch.findByIdAndUpdate(id, data, {
         returnDocument: 'after'
     })
@@ -28,6 +28,6 @@ exports.updatePitch = async (id, data) => {
     return newPitch
 }
 
-exports.deletePitch = async (id) => {
+exports.delete = async (id) => {
     await Pitch.findByIdAndDelete(id)
 }

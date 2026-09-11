@@ -26,19 +26,19 @@ const pitchSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            default: 'actifv',
+            default: 'active',
             enum: {
-                values: ['active, maintenance, inactive'],
+                values: ['active', 'maintenance', 'inactive'],
             }
         },
-        status: {
+        price: {
             type: Number,
             default: 200
         }
     }
 )
 
-const Pitch = mongoose.model('Pitch', pitchSchema)
+const Pitch = mongoose.model('pitches', pitchSchema)
 
 module.exports = Pitch
 

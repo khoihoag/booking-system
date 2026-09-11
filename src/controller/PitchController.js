@@ -1,13 +1,26 @@
 const pitchServices = require('./../service/PitchServices')
+const Pitch = require('./../models/PitchModel')
 
-exports.createField = (req, res) => {
+exports.createPitch = async (req, res) => {
+    try {
+        await pitchServices.createPitch(req.body)
+
+        res.status(201).json({
+            status: 'created ....'
+        })
+    } catch (err) {
+        res.status(404).json(
+            console.log(err)
+        )
+    }
 
 }
 
-exports.getAllPitch = (req, res) => {
+exports.getAllPitches = async (req, res) => {
     try {
-        const pitchs = pitchServices.findAllPitch(req.body)
-    
+        // console.log(1)
+        const pitchs = await pitchServices.findAllPitches(req.body)
+        
         res.status(201).json(pitchs)    
     } catch (err) {
         res.status(404).json(
@@ -16,9 +29,9 @@ exports.getAllPitch = (req, res) => {
     }
 }
 
-exports.getPitchById = (req, res) => {
+exports.getPitchById = async (req, res) => {
     try {
-        const pitch = pitchServices.findPitchById(req.params.id)
+        const pitch = await pitchServices.findPitchById(req.params.id)
         
         res.status(201).json(pitch)
     } catch (err) {
@@ -28,11 +41,13 @@ exports.getPitchById = (req, res) => {
     } 
 }
 
-exports.updatePitch = (req, res) => {
+exports.updatePitch = async (req, res) => {
     try {
-        pitchServices.updatePitchById(req.params.id, req.body)
+        await pitchServices.updatePitch(req.params.id, req.body)
         
-        res.status(201)
+        res.status(201).json({
+            status: 'updated ...'
+        })
     } catch (err) {
         res.status(404).json(
             console.log(err)
@@ -40,11 +55,13 @@ exports.updatePitch = (req, res) => {
     } 
 }
 
-exports.deletePitch = (req, res) => {
+exports.deletePitch = async (req, res) => {
     try {
-        pitchServices.deletePitchById(req.params.id)
+        await pitchServices.deletePitch(req.params.id)
         
-        res.status(201).json(pitch)
+        res.status(201).json({
+            status: 'deleted ...'
+        })
     } catch (err) {
         res.status(404).json(
             console.log(err)

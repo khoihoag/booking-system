@@ -4,8 +4,8 @@ const pitchController = require('../controller/PitchController')
 
 const router = express.Router()
 
-router.route('/').get(pitchController.getAllPitchs).post(pitchController.createPitch)
+router.route('/').get(pitchController.getAllPitches).post(pitchController.createPitch)
 
-router.route('/:id').get(pitchController.getPitchsById).delete(pitchController.deletePitch).patch(pitchController.updatePitch)
+router.route('/:id').get(pitchController.getPitchById).delete(pitchController.deletePitch).patch(pitchController.updatePitch)
 
 module.exports = router
