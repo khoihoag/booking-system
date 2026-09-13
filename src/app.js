@@ -5,8 +5,8 @@ const app = express()
 
 const fieldRouter = require('./routes/PitchRouter')
 const timeSlotRouter = require('./routes/TimeSlotRouter')
-const globaErrorlHandler = require('./controller/ErrorController')
-const AppError = require('./utils')
+const globalErrorlHandler = require('./controller/ErrorController')
+const AppError = require('./utils/AppError')
 
 
 app.use(express.json())
@@ -15,10 +15,10 @@ app.use(morgan('dev'))
 app.use('/api/pitch', fieldRouter)
 app.use('/api/timeSlot', timeSlotRouter)
 
-app.all('*', (err, req, res, next) => {
+app.all('/{*splat}', (err, req, res, next) => {
     next(new AppError(`Can not find ${req.originalUrl} in this server`, 404))
 })
 
-app.use(globalHandler)
+app.use(globalErrorlHandler)
 
 module.exports = app
