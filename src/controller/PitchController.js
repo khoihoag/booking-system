@@ -10,7 +10,6 @@ exports.createPitch = catchAsync(async (req, res) => {
         status: 'created',
         data: pitch
     })
-
 })
 
 exports.getAllPitches = catchAsync(async (req, res) => {
@@ -20,10 +19,9 @@ exports.getAllPitches = catchAsync(async (req, res) => {
         status: 'success',
         data: pitches
     })
-
 })
 
-exports.getPitchById = catchAsync(async (req, res, next) => {
+exports.getPitchById = catchAsync(async (req, res) => {
 
     const pitch = await pitchServices.findPitchById(req.params.id)
 
@@ -60,5 +58,4 @@ exports.deletePitch = catchAsync(async (req, res) => {
     }
 
     res.status(204).send()
-
 })

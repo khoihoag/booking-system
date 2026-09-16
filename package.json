@@ -17,9 +17,11 @@
   },
   "homepage": "https://github.com/khoihoag/booking-system#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mongoose": "^9.9.5",
-    "morgan": "^1.12.0"
+    "morgan": "^1.12.0",
+    "validator": "^13.15.35"
   }
 }
