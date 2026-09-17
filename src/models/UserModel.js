@@ -27,7 +27,8 @@ const UserSchema = new mongoose.Schema({
                 return el == this.password
             },
             message: 'Passwords are not the same!'
-        }
+        },
+        selcect: false
     },
     role: {
         type: String,
@@ -48,6 +49,12 @@ UserSchema.pre('save', async function() {
     this.password_confirm = undefined
     
 })
+
+// Tạo method cho mỗi UserDocument
+// candidatePassword: mật khảu được nhập vào khi đăng nhập, sẽ được hàm compare tự động hash để so sánh với userPassword được lưu trong database
+UserSchema.methods.correctPassword = async (candidatePassword, userPassword) => {
+    return await bcrypt.compare(candidatePassword, userPassword)
+}
 
 
 const User = mongoose.model('users', UserSchema)
