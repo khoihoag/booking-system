@@ -71,14 +71,28 @@ exports.protect = catchAsync(async (req, res, next) => {
     
 
     // Check  if user still exists
-    const freshUser = await User.findById(decoded.id)
-    if (!freshUser) {
+    const currentUser = await User.findById(decoded.id)
+    if (!currentUser) {
         return next(new AppError('The user belonging to this token does no longer exist.'), 401)
     }
 
     // Check if user changed password after the token was issued
-    if (freshUser.changedPasswordAt(decoded.iat)) {
+    if (currentUser.changedPassword(decoded.iat)) {
         return next(new AppError('User recently chagned password! Please log in again', 401))
     }
+
+    req.user = currentUser
     next()
 })
+
+exports.restrictTo = (role) => {
+    
+    return (req, res, next) => {
+        console.log(req.user.role)
+
+        if (role !== req.user.role) {
+            return next(new AppError('You do not have permission ton perform this action.', 401))
+        }
+        next()
+    }
+}

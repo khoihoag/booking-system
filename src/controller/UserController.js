@@ -48,9 +48,9 @@ exports.updateUser = catchAsync(async (req, res) => {
 exports.deleteUser = catchAsync(async (req, res) => {
     const user = await userServices.deleteUser(req.params.id)
 
-    if (!timeSlot) {
+    if (!user) {
         return new AppError("No user found with that ID", 404)
     }
-
+    console.log(1)
     res.status(204).send()
 })
