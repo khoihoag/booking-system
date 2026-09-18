@@ -12,10 +12,17 @@ const AppError = require('./utils/AppError')
 
 app.use(express.json())
 app.use(morgan('dev'))
+app.use((req, res, next) => {
+    console.log(req.headers)
+    next()
+})
+
 
 app.use('/api/pitch', fieldRouter)
 app.use('/api/timeSlot', timeSlotRouter)
 app.use('/api/user', userRouter)
+
+
 
 app.all('/{*splat}', (err, req, res, next) => {
     next(new AppError(`Can not find ${req.originalUrl} in this server`, 404))

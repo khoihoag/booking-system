@@ -1,3 +1,5 @@
+const AppError = require("../utils/AppError")
+
 const sendErrorDev = (err, res) => {
     res.status(err.statusCode || 500).json({
         status: err.status,
@@ -21,10 +23,13 @@ const sendErrorProd = (err, res) => {
     }
 }
 
+const handleJWTError = err => new AppError('Invalid token. Place log in again.')
+
 module.exports = (err, req, res, next) => {
     if (process.env.NODE_ENV === 'development') {
         sendErrorDev(err, res)
     } else if (process.env.NODE_ENV === 'production') {
+        if (err.name  === 'JsonWebTokenError') err => handleJWTError(err)
         sendErrorProd(err, res)
     }
 }

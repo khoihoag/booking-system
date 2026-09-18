@@ -34,7 +34,8 @@ const UserSchema = new mongoose.Schema({
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
-    }
+    },
+    changedPasswordAt: Date,
 }) 
 
 
@@ -54,6 +55,15 @@ UserSchema.pre('save', async function() {
 // candidatePassword: mật khảu được nhập vào khi đăng nhập, sẽ được hàm compare tự động hash để so sánh với userPassword được lưu trong database
 UserSchema.methods.correctPassword = async (candidatePassword, userPassword) => {
     return await bcrypt.compare(candidatePassword, userPassword)
+}
+
+UserSchema.methods.changedPassword = (JWTTimeStamp) => {
+    if (this.changedPasswordAt) {
+        const changedTimeStamp = this.changedPasswordAt.getTime() / 1000
+        return JWTTimeStamp < changedTimeStamp
+    }
+
+    return false
 }
 
 
