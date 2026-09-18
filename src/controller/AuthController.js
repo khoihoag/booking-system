@@ -96,3 +96,18 @@ exports.restrictTo = (role) => {
         next()
     }
 }
+
+
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+    // Get user with email
+    const user = await User.findOne({email: req.email })
+
+    if (!user) {
+        return next(new AppError('There are no user with email adress', 404))
+    }
+
+    // Generate the random reset toke 
+    const resetToken = user.createResetPasswordToken()
+    await user.save()   // save vì các thay đổi với obj user từ func createResetPasswordToken chỉ là thay đỏi trên RAM cần save để thay đổi dưới db
+})
