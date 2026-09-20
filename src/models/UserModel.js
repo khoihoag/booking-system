@@ -36,12 +36,12 @@ const UserSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user'
     },
-    changedPasswordAt: Date,
+    passwordChangeAt: Date,
     passwordResetToken: String,
     passwordResetExpries: Date,
 }) 
 
-
+// Không cho password dạng plain text được lưu trực tiếp vào database.
 UserSchema.pre('save', async function() {
     // chạy khi mặt khẩu đã đc biến đổi
     if(!this.isModified('password')) return
@@ -54,6 +54,13 @@ UserSchema.pre('save', async function() {
     
 })
 
+// Ghi lại thời điểm user thay đổi password.
+UserSchema.pre('save', function() {
+    if(!this.isModified('password') || this.isNew) return 
+
+    this.passwordChangeAt = Date.now() -  1000
+})
+
 // Tạo method cho mỗi UserDocument
 // candidatePassword: mật khảu được nhập vào khi đăng nhập, sẽ được hàm compare tự động hash để so sánh với userPassword được lưu trong database
 UserSchema.methods.correctPassword = async (candidatePassword, userPassword) => {
@@ -61,8 +68,8 @@ UserSchema.methods.correctPassword = async (candidatePassword, userPassword) => 
 }
 
 UserSchema.methods.changedPassword = (JWTTimeStamp) => {
-    if (this.changedPasswordAt) {
-        const changedTimeStamp = this.changedPasswordAt.getTime() / 1000
+    if (this.passwordChangeAt) {
+        const changedTimeStamp = this.passwordChangeAt.getTime() / 1000
         return JWTTimeStamp < changedTimeStamp
     }
 
