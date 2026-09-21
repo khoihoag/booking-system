@@ -43,3 +43,7 @@ exports.updateData = async (userId, body) => {
 
     return updatedUser
 }
+
+exports.deleteMe = async (userId) => {
+    return userRepository.deleteMe(userId)
+}

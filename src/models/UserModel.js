@@ -39,6 +39,11 @@ const UserSchema = new mongoose.Schema({
     passwordChangeAt: Date,
     passwordResetToken: String,
     passwordResetExpries: Date,
+    active: {
+        type: Boolean,
+        default: true,
+        select: false,
+    }
 }) 
 
 // Hash password before saving
@@ -55,6 +60,11 @@ UserSchema.pre('save', function() {
 
     this.passwordChangeAt = Date.now() - 1000
 })
+
+UserSchema.pre(/^find/, function() {
+    this.find({active: {$ne: false}})   
+})
+
 
 // Compare candidate password with stored hashed password
 UserSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
