@@ -54,3 +54,4 @@ exports.deleteUser = catchAsync(async (req, res) => {
     console.log(1)
     res.status(204).send()
 })
+

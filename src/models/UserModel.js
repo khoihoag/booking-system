@@ -2,6 +2,16 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const cryto = require('crypto')
+const AppError = require('../utils/AppError')
+const CatchAsyns = require('../utils/CatchAsyns')
+
+
+const filterObj = (obj, ...allowedFields) => {
+    const newObj = {}
+    Object.keys(obj).forEach(el => {
+        if (allowedFields.includes(el)) newObj[el] = obj[el]
+    })
+}
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -85,6 +95,19 @@ UserSchema.methods.createResetPasswordToken = function () {
     return resetToken 
 }
 
+// Update data user
+UserSchema.methods.updateData =CatchAsyns(async (req, res, next) => {
+    if (req.body.password || req.body.password_confirm) {
+        return next(new AppError('This route is not for password updates. Place use /updatePassword'))
+    }
+
+    const filteredBody = filterObj(req.body, 'name', 'email')
+    const updatedUser = await User.findByIdAndDelete(req.user.id, filterObj)
+
+    res.status(200).json({
+        status: 'success'
+    })
+})
 
 const User = mongoose.model('users', UserSchema)
 
