@@ -1,22 +1,12 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
-const cryto = require('crypto')
-const AppError = require('../utils/AppError')
-const CatchAsyns = require('../utils/CatchAsyns')
-
-
-const filterObj = (obj, ...allowedFields) => {
-    const newObj = {}
-    Object.keys(obj).forEach(el => {
-        if (allowedFields.includes(el)) newObj[el] = obj[el]
-    })
-}
+const crypto = require('crypto')
 
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'Please provide a valid email'],
+        required: [true, 'Please provide a name'],
     },
     email: {
         type: String,
@@ -28,18 +18,18 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         minlength: 8,
-        required: [true, 'Please provide a valid password'],
+        required: [true, 'Please provide a password'],
+        select: false
     },
     password_confirm: {
         type: String,
-        required: [true, 'Please provide a valid password'],
+        required: [true, 'Please confirm your password'],
         validate: {
-            validator:function (el) {
-                return el == this.password
+            validator: function (el) {
+                return el === this.password
             },
             message: 'Passwords are not the same!'
-        },
-        selcect: false
+        }
     },
     role: {
         type: String,
@@ -51,63 +41,45 @@ const UserSchema = new mongoose.Schema({
     passwordResetExpries: Date,
 }) 
 
-// Không cho password dạng plain text được lưu trực tiếp vào database.
+// Hash password before saving
 UserSchema.pre('save', async function() {
-    // chạy khi mặt khẩu đã đc biến đổi
-    if(!this.isModified('password')) return
+    if (!this.isModified('password')) return
 
-    // biến đổi mật khẩu
     this.password = await bcrypt.hash(this.password, 12)
-
-    // xóa trường password_confirm
     this.password_confirm = undefined
-    
 })
 
-// Ghi lại thời điểm user thay đổi password.
+// Update passwordChangeAt property before saving if password was modified
 UserSchema.pre('save', function() {
-    if(!this.isModified('password') || this.isNew) return 
+    if (!this.isModified('password') || this.isNew) return
 
-    this.passwordChangeAt = Date.now() -  1000
+    this.passwordChangeAt = Date.now() - 1000
 })
 
-// Tạo method cho mỗi UserDocument
-// candidatePassword: mật khảu được nhập vào khi đăng nhập, sẽ được hàm compare tự động hash để so sánh với userPassword được lưu trong database
-UserSchema.methods.correctPassword = async (candidatePassword, userPassword) => {
+// Compare candidate password with stored hashed password
+UserSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
     return await bcrypt.compare(candidatePassword, userPassword)
 }
 
-UserSchema.methods.changedPassword = (JWTTimeStamp) => {
+// Check if user changed password after token issuance
+UserSchema.methods.changedPassword = function (JWTTimeStamp) {
     if (this.passwordChangeAt) {
-        const changedTimeStamp = this.passwordChangeAt.getTime() / 1000
+        const changedTimeStamp = parseInt(this.passwordChangeAt.getTime() / 1000, 10)
         return JWTTimeStamp < changedTimeStamp
     }
 
     return false
 }
 
+// Generate random password reset token
 UserSchema.methods.createResetPasswordToken = function () {
-    const resetToken = cryto.randomBytes(32).toString('hex')
+    const resetToken = crypto.randomBytes(32).toString('hex')
 
-    this.passwordResetToken = cryto.createHash('sha256').update(resetToken).digest('hex')
-    this.passwordResetExpries = Date.now() + 5 * 60 * 1000
-    
+    this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
+    this.passwordResetExpries = Date.now() + 10 * 60 * 1000 // 10 minutes
+
     return resetToken 
 }
-
-// Update data user
-UserSchema.methods.updateData =CatchAsyns(async (req, res, next) => {
-    if (req.body.password || req.body.password_confirm) {
-        return next(new AppError('This route is not for password updates. Place use /updatePassword'))
-    }
-
-    const filteredBody = filterObj(req.body, 'name', 'email')
-    const updatedUser = await User.findByIdAndDelete(req.user.id, filterObj)
-
-    res.status(200).json({
-        status: 'success'
-    })
-})
 
 const User = mongoose.model('users', UserSchema)
 
