@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const { Schema }  = mongoose
+
 
 const timeSlotSchema = new mongoose.Schema(
     {

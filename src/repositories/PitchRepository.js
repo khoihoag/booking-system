@@ -6,11 +6,17 @@ exports.create = async (data) => {
 }
 
 exports.findAll = async () => {
-    return Pitch.find().populate('users')
+    return Pitch.find().populate({
+        path: 'ownerId',
+        select: ['name', 'email', '-_id']
+    })
 }
 
 exports.findById = async (id) => {
-    return Pitch.findById(id).populate('users')
+    return Pitch.findById(id).populate({
+        path: 'ownerId',
+        select: ['name', 'email', '-_id']
+    })
 }
 
 exports.update = async (id, data) => {

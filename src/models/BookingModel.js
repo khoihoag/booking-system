@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 const TimeSlot = require('./TimeSlotModel')
+const { Schema }  = mongoose
+
 
 const BookingShema = new mongoose.Schema({
     timeSlotId: {

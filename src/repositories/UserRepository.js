@@ -5,14 +5,21 @@ exports.create = async (data) => {
 }
 
 exports.findAll = async () => {
-    return await User.find()
+
+const user = await User
+        .findById('6ab0f533e30e7081baee4ed5')
+        .populate('pitches')
+    console.log(user)
+    console.log('PITCHES:', user.pitches)
+
+    return await User.find().populate('pitches')
 }
 
 exports.findById = async (id, selectPassword = false) => {
     if (selectPassword) {
         return await User.findById(id).select('+password')
     }
-    return await User.findById(id).populate
+    return await User.findById(id).populate('pitches')
 }
 
 exports.findByEmail = async (email, selectPassword = false) => {

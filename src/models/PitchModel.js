@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { Schema }  = mongoose
 
 const pitchSchema = new mongoose.Schema(
     {   
@@ -7,7 +8,7 @@ const pitchSchema = new mongoose.Schema(
             ref: 'users',
             required: true
         },
-        name: {
+        name: { 
             type: String,
             required: [true, 'a pitch must have a name']
         },

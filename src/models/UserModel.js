@@ -3,6 +3,7 @@ const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const crypto = require('crypto')
 
+
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -45,6 +46,17 @@ const UserSchema = new mongoose.Schema({
         select: false,
     }
 }) 
+
+UserSchema.virtual('pitches', {
+    ref: 'pitches',
+    localField: "_id",
+    foreignField: 'ownerId',
+})
+
+UserSchema.set('toJSON', { virtuals: true })
+UserSchema.set('toObject', { virtuals: true })
+
+
 
 // Hash password before saving
 UserSchema.pre('save', async function() {
