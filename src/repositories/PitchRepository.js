@@ -6,11 +6,11 @@ exports.create = async (data) => {
 }
 
 exports.findAll = async () => {
-    return Pitch.find()
+    return Pitch.find().populate('users')
 }
 
 exports.findById = async (id) => {
-    return Pitch.findById(id)
+    return Pitch.findById(id).populate('users')
 }
 
 exports.update = async (id, data) => {

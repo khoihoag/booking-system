@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const timeSlotSchema = new mongoose.Schema(
     {
-        field_id: {
+        pitchId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'pitches',
             required: [true, 'a time slot must belong to a pitch']
@@ -23,7 +23,7 @@ const timeSlotSchema = new mongoose.Schema(
             type: String,
             default: 'available',
             enum: {
-                values: ['available', 'booked', 'held', 'blocked', 'maintenance'],
+                values: ['available', 'booked', 'locked'],
                 message: 'status must be available, booked, held, blocked, or maintenance'
             }
         },

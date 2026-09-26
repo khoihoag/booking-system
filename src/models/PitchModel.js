@@ -1,7 +1,12 @@
 const mongoose = require('mongoose')
 
 const pitchSchema = new mongoose.Schema(
-    {
+    {   
+        ownerId: {
+            type: Schema.Types.ObjectId,
+            ref: 'users',
+            required: true
+        },
         name: {
             type: String,
             required: [true, 'a pitch must have a name']

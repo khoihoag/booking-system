@@ -12,7 +12,7 @@ exports.findById = async (id, selectPassword = false) => {
     if (selectPassword) {
         return await User.findById(id).select('+password')
     }
-    return await User.findById(id)
+    return await User.findById(id).populate
 }
 
 exports.findByEmail = async (email, selectPassword = false) => {
