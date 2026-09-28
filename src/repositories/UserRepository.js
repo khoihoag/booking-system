@@ -41,5 +41,5 @@ exports.saveUser = async (user, options = {}) => {
 }
 
 exports.delete = async (id) => {
-    return await User.findByIdAndDelete(id, {active: false})
+    return await User.findByIdAndDelete(id, {active: false}, {new: true})
 }
