@@ -5,23 +5,30 @@ const authController = require('../controller/AuthController')
 
 const router = express.Router()
 
+// Công khai
 router.post('/signup', authController.signup)
 router.post('/login', authController.login)
-
 router.post('/forgotPassword', authController.forgotPassword)
 router.patch('/resetPassword/:token', authController.resetPassword)
-router.patch('/updateData', authController.protect, userController.updateData)
-router.patch('/updatePassword', authController.protect, authController.updatePassword)
 
-router.delete('/deleteMe', authController.protect, userController.deleteMe)
+// Yêu cầu: Đăng Nhập
+router.use(authController.protect)
 
+router.get('/me', userController.getMe)
+router.patch('/updateData', userController.updateData)
+router.patch('/updatePassword', authController.updatePassword)
+router.delete('/deleteMe', userController.deleteMe)
+
+
+// Yêu cầu: ADMIN
+router.use(authController.restrictTo('admin'))
 router.route('/')
-    .get(authController.protect, userController.getAllUsers)
+    .get(userController.getAllUsers)
     .post(userController.createUser)
 
 router.route('/:id')
     .get(userController.getUserById)
-    .delete(authController.protect, authController.restrictTo('admin'), userController.deleteUser)
+    .delete(userController.deleteUser)
     .patch(userController.updateUser)
 
 module.exports = router

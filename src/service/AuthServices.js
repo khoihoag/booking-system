@@ -19,7 +19,6 @@ exports.signup = async (userData) => {
         email: userData.email,
         password: userData.password,
         password_confirm: userData.password_confirm,
-        role: userData.role
     })
 
     const token = signToken(newUser._id)

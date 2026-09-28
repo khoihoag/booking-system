@@ -5,13 +5,6 @@ exports.create = async (data) => {
 }
 
 exports.findAll = async () => {
-
-const user = await User
-        .findById('6ab0f533e30e7081baee4ed5')
-        .populate('pitches')
-    console.log(user)
-    console.log('PITCHES:', user.pitches)
-
     return await User.find().populate('pitches')
 }
 
@@ -48,9 +41,5 @@ exports.saveUser = async (user, options = {}) => {
 }
 
 exports.delete = async (id) => {
-    return await User.findByIdAndDelete(id)
-}
-
-exports.deleteMe = async (id) => {
-    return await User.findByIdAndUpdate(id, {active: false})
+    return await User.findByIdAndDelete(id, {active: false})
 }

@@ -44,6 +44,12 @@ const pitchSchema = new mongoose.Schema(
     }
 )
 
+pitchSchema.virtual('time_slots', {
+    ref: "TimeSlot",
+    localField: "_id",
+    foreignField: "pitchId"
+})
+
 const Pitch = mongoose.model('pitches', pitchSchema)
 
 module.exports = Pitch

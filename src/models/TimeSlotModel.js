@@ -44,6 +44,12 @@ const timeSlotSchema = new mongoose.Schema(
     }
 )
 
+timeSlotSchema.virtual("booking", {
+    ref: "booking",
+    localField: "_id",
+    foreignField: "timeSlotId"
+})
+
 timeSlotSchema.pre('validate', function () {
     if (this.start_time && this.end_time && this.end_time <= this.start_time) {
         this.invalidate('end_time', 'end time must be after start time')
