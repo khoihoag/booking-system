@@ -5,19 +5,20 @@ exports.create = async (data) => {
     return Pitch.create(data)
 }
 
-exports.findAll = async () => {
-    return Pitch.find().populate({
+exports.findOne = async (filter) => {
+    return await Pitch.findOne(filter).populate({
         path: 'ownerId',
         select: ['name', 'email', '-_id']
     })
 }
 
-exports.findById = async (id) => {
-    return Pitch.findById(id).populate({
+exports.findByFilter = async (filter = {}) => {
+    return await Pitch.find(filter).populate({
         path: 'ownerId',
         select: ['name', 'email', '-_id']
     })
 }
+
 
 exports.update = async (id, data) => {
     const pitch = await Pitch.findById(id)

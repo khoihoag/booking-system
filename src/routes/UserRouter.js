@@ -2,6 +2,7 @@ const express = require('express')
 
 const userController = require('../controller/UserController')
 const authController = require('../controller/AuthController')
+const pitchController = require('./../controller/PitchController')
 
 const router = express.Router()
 
@@ -19,11 +20,12 @@ router.patch('/updateData', userController.updateData)
 router.patch('/updatePassword', authController.updatePassword)
 router.delete('/deleteMe', userController.deleteMe)
 
+router.get('/my-pitches', authController.protect, authController.restrictTo('pitch_owner'), pitchController.getPitchesByUser)
 
 // Yêu cầu: ADMIN
 router.use(authController.restrictTo('admin'))
 router.route('/')
-    .get(userController.getAllUsers)
+            .get(userController.getAllUsers)
     .post(userController.createUser)
 
 router.route('/:id')

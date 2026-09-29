@@ -12,6 +12,20 @@ exports.createPitch = catchAsync(async (req, res) => {
     })
 })
 
+exports.getPitchesByUser = catchAsync(async (req, res, next) => {
+    const ownerId = req.user.id
+    const pitches = await pitchServices.findByOwner(ownerId)
+
+    if (!pitches) {
+        return next(new AppError("No pitch found with that ID", 404))
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: pitches
+    })
+}) 
+
 exports.getAllPitches = catchAsync(async (req, res) => {
     const pitches = await pitchServices.findAllPitches()
 
@@ -21,13 +35,13 @@ exports.getAllPitches = catchAsync(async (req, res) => {
     })
 })
 
-exports.getPitchById = catchAsync(async (req, res) => {
+exports.getPitchById = catchAsync(async (req, res, next) => {
 
     const pitch = await pitchServices.findPitchById(req.params.id)
 
     
     if (!pitch) {
-        return new AppError("No tour found with that ID", 404)
+        return next(new AppError("No pitch found with that ID", 404))
     }
 
     res.status(200).json({
@@ -40,7 +54,7 @@ exports.updatePitch = catchAsync(async (req, res) => {
     const pitch = await pitchServices.updatePitch(req.params.id, req.body)
 
     if (!pitch) {
-        return new AppError("No tour found with that ID", 404)
+        return new AppError("No pitch found with that ID", 404)
     }
 
     res.status(200).json({
