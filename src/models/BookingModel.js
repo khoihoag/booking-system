@@ -1,33 +1,38 @@
 const mongoose = require('mongoose')
-const TimeSlot = require('./TimeSlotModel')
-const { Schema }  = mongoose
+const { Schema } = mongoose
 
-
-const BookingShema = new mongoose.Schema({
-    timeSlotId: {
-        type: Schema.Types.ObjectId,
-        ref: 'time_slots',
-        required: true
+const bookingSchema = new mongoose.Schema(
+    {
+        timeSlotId: {
+            type: Schema.Types.ObjectId,
+            ref: 'time_slots',
+            required: [true, 'A booking must have a time slot']
+        },
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: 'users',
+            required: [true, 'A booking must belong to a user']
+        },
+        totalPrice: {
+            type: Number,
+            required: [true, 'A booking must have a total price']
+        },
+        status: {
+            type: String,
+            enum: {
+                values: ['pending', 'confirmed', 'cancelled', 'completed'],
+                message: 'Status must be pending, confirmed, cancelled, or completed'
+            },
+            default: 'confirmed'
+        }
     },
-    userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'users',
-        required: true,
-    },
-    totalPrice: {
-        type: Number,
-        required: true,
-    },
-    status: {
-        type: String,
-        enum: ['pending', 'confirmed', 'cancelled', 'completed']
-    },
-    status: {
-        type: String,
+    {
+        timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
     }
-})
+)
 
+const Booking = mongoose.model('booking', bookingSchema)
 
-const booking = mongoose.model('booking', BookingShema)
-
-module.exports = booking
+module.exports = Booking

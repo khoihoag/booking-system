@@ -10,6 +10,7 @@ const app = express()
 const fieldRouter = require('./routes/PitchRouter')
 const timeSlotRouter = require('./routes/TimeSlotRouter')
 const userRouter = require('./routes/UserRouter')
+const bookingRouter = require('./routes/BookingRoute')
 const globalErrorlHandler = require('./controller/ErrorController')
 const AppError = require('./utils/AppError')
 
@@ -35,6 +36,8 @@ app.use('/api', limiter)
 app.use('/api/pitch', fieldRouter)
 app.use('/api/timeSlot', timeSlotRouter)
 app.use('/api/user', userRouter)
+app.use('/api/booking', bookingRouter)
+app.use('/api/bookings', bookingRouter)
 
 
 
