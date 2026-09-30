@@ -29,7 +29,7 @@ module.exports = (err, req, res, next) => {
     if (process.env.NODE_ENV === 'development') {
         sendErrorDev(err, res)
     } else if (process.env.NODE_ENV === 'production') {
-        if (err.name  === 'JsonWebTokenError') err => handleJWTError(err)
+        if (err.name  === 'JsonWebTokenError') err = handleJWTError(err)
         sendErrorProd(err, res)
     }
 }

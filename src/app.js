@@ -41,7 +41,7 @@ app.use('/api/bookings', bookingRouter)
 
 
 
-app.all('/{*splat}', (err, req, res, next) => {
+app.all('*splat', (req, res, next) => {
     next(new AppError(`Can not find ${req.originalUrl} in this server`, 404))
 })
 
