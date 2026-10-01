@@ -9,7 +9,7 @@ router.route('/')
     .get(pitchController.getAllPitches)
     .post(
         authController.protect, 
-        authController.restrictTo('admin', 'pitch_owner'), 
+        authController.restrictTo('pitch_owner'), 
         pitchController.createPitch
     )
 

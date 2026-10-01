@@ -5,11 +5,11 @@ exports.create = async (data) => {
 }
 
 exports.findAll = async () => {
-    return TimeSlot.find().populate('pitches')
+    return TimeSlot.find().populate('pitchId')
 }
 
 exports.findById = async (id) => {
-    return TimeSlot.findById(id).populate('pitches')
+    return TimeSlot.findById(id).populate('pitchId')
 }
 
 exports.update = async (id, data) => {
