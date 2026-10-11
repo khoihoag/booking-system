@@ -1,0 +1,143 @@
+/* Global CSS Stylesheet for PitchBook */
+:root {
+  --bg-midnight: #180832;
+  --bg-secondary: #210B3D;
+  --color-neon-primary: #80FF72;
+  --color-neon-secondary: #55E86B;
+  --color-electric-blue: #164BFF;
+  --color-text-white: #ffffff;
+  --color-text-muted: #D2C9E0;
+  --color-light-bg: #F5F7F4;
+  --color-dark-text: #17231B;
+  
+  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --border-neon-subtle: rgba(128, 255, 114, 0.2);
+  --border-glass: rgba(255, 255, 255, 0.1);
+  --border-light: #E5E7EB;
+
+  --shadow-neon: 0 0 25px -4px rgba(128, 255, 114, 0.45);
+  --shadow-neon-subtle: 0 0 15px -2px rgba(128, 255, 114, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-midnight);
+  color: var(--color-text-white);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: var(--color-neon-primary);
+  color: var(--bg-midnight);
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+input, select, textarea {
+  font-family: inherit;
+}
+
+/* Background Grids & Spatial Effects */
+.bg-grid-cyber {
+  background-size: 44px 44px;
+  background-image: 
+    linear-gradient(to right, rgba(210, 201, 224, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(210, 201, 224, 0.05) 1px, transparent 1px);
+}
+
+.perspective-grid-stage {
+  perspective: 600px;
+  perspective-origin: 50% 30%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 288px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.perspective-grid-floor {
+  position: absolute;
+  inset: -40% -20% 0 -20%;
+  transform: rotateX(68deg);
+  transform-origin: 50% 100%;
+  background-size: 50px 50px;
+  background-image: 
+    linear-gradient(to right, rgba(22, 75, 255, 0.45) 1.5px, transparent 1.5px),
+    linear-gradient(to bottom, rgba(22, 75, 255, 0.45) 1.5px, transparent 1.5px);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.25) 45%, rgba(0, 0, 0, 0) 80%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.25) 45%, rgba(0, 0, 0, 0) 80%);
+  pointer-events: none;
+}
+
+.neon-glow-primary {
+  box-shadow: 0 0 25px -4px rgba(128, 255, 114, 0.5);
+}
+
+.neon-glow-subtle {
+  box-shadow: 0 0 15px -2px rgba(128, 255, 114, 0.2);
+}
+
+.neon-border-glow {
+  border-color: #80FF72;
+  box-shadow: inset 0 0 12px rgba(128, 255, 114, 0.15), 0 0 12px rgba(128, 255, 114, 0.2);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInFromBottom {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInFromTop {
+  from { transform: translateY(-12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #180832;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a1052;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3c1973;
+}
+

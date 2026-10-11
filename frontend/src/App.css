@@ -1,0 +1,87 @@
+/* App.css */
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-midnight);
+  color: #ffffff;
+}
+
+.app-main {
+  flex: 1;
+}
+
+/* Floating Demo Role Switcher Toolbar */
+.demo-role-toolbar {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem;
+  border-radius: 9999px;
+  background-color: rgba(24, 8, 50, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(128, 255, 114, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  font-size: 0.75rem;
+}
+
+.demo-role-label {
+  display: none;
+  padding: 0 0.5rem;
+  font-size: 0.625rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(210, 201, 224, 0.6);
+}
+
+@media (min-width: 640px) {
+  .demo-role-label {
+    display: inline-block;
+  }
+}
+
+.demo-role-btn {
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.demo-role-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.demo-role-btn.active {
+  background-color: var(--color-neon-primary);
+  color: var(--bg-midnight);
+  font-weight: 700;
+}
+
+.demo-role-btn-text {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .demo-role-btn-text {
+    display: inline;
+  }
+}
+
+.demo-role-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
