@@ -47,7 +47,7 @@ export default function SignIn() {
                 </form>
                 <div className="auth-footer-prompt">
                     Don't have an account yet? 
-                    <a href="signup.html">Create Account</a>
+                    <a href="signup.html">  Create Account</a>
                 </div>
             </div>
         </div>
