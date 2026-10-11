@@ -1,0 +1,25 @@
+@import '../../common.css';
+
+.dash-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.dash-nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.dash-nav-item.active {
+  background-color: var(--color-neon-primary);
+  color: var(--bg-midnight);
+  font-weight: 700;
+}
