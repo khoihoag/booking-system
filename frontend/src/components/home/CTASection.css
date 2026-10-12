@@ -1,0 +1,44 @@
+
+@import './../../common.css';
+
+
+.cta-btn-primary {
+  padding: 0.85rem 2rem;
+  font-size: 1rem;
+}
+
+.cta-btn-secondary {
+  padding: 0.85rem 2rem;
+  font-size: 1rem;
+}
+
+.cta-section {
+  position: relative;
+  background-color: var(--bg-midnight);
+  padding: 6rem 0;
+  text-align: center;
+  border-top: 1px solid var(--border-neon-subtle);
+  overflow: hidden;
+}
+
+.cta-title {
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  font-weight: 800;
+  color: var(--color-neon-primary);
+  text-shadow: 0 0 25px rgba(128, 255, 114, 0.3);
+}
+
+.cta-desc {
+  margin-top: 1rem;
+  font-size: 1.15rem;
+  color: var(--color-text-muted);
+}
+
+.cta-buttons {
+  margin-top: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
