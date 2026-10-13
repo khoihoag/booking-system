@@ -1,0 +1,193 @@
+/* ==========================================================================
+   PitchBook - Admin Dashboard Stylesheet (admin-dashboard.css)
+   ========================================================================== */
+
+@import './../../common.css';
+
+.admin-banner {
+  background-color: var(--bg-midnight);
+  border-bottom: 1px solid var(--border-neon-subtle);
+  padding: 2rem 0;
+  color: #ffffff;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.kpi-card {
+  background-color: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-card);
+}
+
+.kpi-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #9CA3AF;
+  letter-spacing: 0.05em;
+}
+
+.kpi-value {
+  font-family: var(--font-display);
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--color-dark-text);
+  margin-top: 0.35rem;
+}
+
+/* Data Tables */
+.data-table-wrapper {
+  background-color: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  box-shadow: var(--shadow-card);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8125rem;
+}
+
+.data-table th {
+  background-color: #F9FAFB;
+  color: #6B7280;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.data-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #F3F4F6;
+  color: var(--color-dark-text);
+}
+
+.data-table tr:hover td {
+  background-color: #F9FAFB;
+}
+
+body.admin-body {
+  background-color: var(--color-light-bg);
+  color: var(--color-dark-text);
+}
+
+.admin-role-badge {
+  font-size: 0.8125rem;
+  color: #60A5FA;
+  font-family: var(--font-mono);
+}
+
+.admin-signout-btn {
+  font-size: 0.75rem;
+}
+
+.admin-badge-label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  color: var(--color-neon-primary);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.admin-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+}
+
+.admin-subtitle {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}
+
+.admin-content-container {
+  padding: 2.5rem 1.5rem 5rem;
+}
+
+.kpi-sub-positive {
+  font-size: 0.6875rem;
+  color: #059669;
+  margin-top: 0.25rem;
+}
+
+.kpi-sub-neutral {
+  font-size: 0.6875rem;
+  color: #6B7280;
+  margin-top: 0.25rem;
+}
+
+.kpi-val-mono {
+  font-family: var(--font-mono);
+  font-size: 1.6rem;
+}
+
+.admin-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.table-wrapper-spaced {
+  margin-bottom: 3rem;
+}
+
+.table-th-right {
+  text-align: right;
+}
+
+.table-td-right {
+  text-align: right;
+}
+
+.cell-subtext {
+  font-size: 0.6875rem;
+  color: #9CA3AF;
+}
+
+.role-tag-player {
+  background: #F3F4F6;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.role-tag-owner {
+  background: #DBEAFE;
+  color: #1E40AF;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.btn-action-danger {
+  font-size: 0.6875rem;
+  padding: 0.35rem 0.75rem;
+  color: #DC2626;
+  border-color: #FCA5A5;
+}
+
+.table-price-cell {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.btn-action-audit {
+  font-size: 0.6875rem;
+  padding: 0.35rem 0.75rem;
+  color: var(--color-dark-text);
+  border-color: #D1D5DB;
+}
+
