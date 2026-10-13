@@ -1,0 +1,198 @@
+@import './../../common.css';
+
+.section-light {
+  background-color: var(--color-light-bg);
+  color: var(--color-dark-text);
+  padding: 6rem 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.section-kicker {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-electric-blue);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.section-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--color-dark-text);
+}
+
+.section-desc {
+  margin-top: 0.75rem;
+  font-size: 1.05rem;
+  color: rgba(23, 35, 27, 0.7);
+}
+
+.view-all-pitches-btn {
+  color: var(--color-neon-primary);
+}
+
+.pitch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 2rem;
+}
+
+.pitch-card {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.pitch-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.pitch-photo-wrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background-color: #e5e7eb;
+}
+
+.pitch-photo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.pitch-card:hover .pitch-photo-wrap img {
+  transform: scale(1.04);
+}
+
+.pitch-badge-surface,
+.pitch-badge-rating,
+.pitch-badge-type {
+  position: absolute;
+  border-radius: var(--radius-sm);
+}
+
+.pitch-badge-surface {
+  top: 12px;
+  left: 12px;
+  background-color: rgba(24, 8, 50, 0.88);
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.pitch-badge-rating {
+  top: 12px;
+  right: 12px;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: var(--color-dark-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pitch-badge-type {
+  bottom: 12px;
+  left: 12px;
+  background-color: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+}
+
+.pitch-card-body {
+  padding: 1.25rem;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pitch-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-dark-text);
+  line-height: 1.3;
+}
+
+.pitch-card-location {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.pitch-facilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.facility-chip {
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background-color: var(--color-light-bg);
+  color: #4b5563;
+  font-size: 0.6875rem;
+}
+
+.pitch-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.pitch-rate-label {
+  color: #9ca3af;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pitch-rate-val {
+  color: var(--color-dark-text);
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.pitch-rate-unit {
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .pitch-grid {
+    grid-template-columns: 1fr;
+  }
+}

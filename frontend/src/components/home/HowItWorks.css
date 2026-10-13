@@ -1,0 +1,99 @@
+@import './../../common.css';
+
+/* How It Works Section */
+.section-dark {
+  background-color: var(--bg-secondary);
+  padding: 6rem 0;
+  border-top: 1px solid var(--border-neon-subtle);
+  position: relative;
+  overflow: hidden;
+}
+
+.how-it-works-header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.hero-tagline {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--color-neon-primary);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 12px rgba(128, 255, 114, 0.3);
+}
+
+.section-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--color-dark-text);
+}
+
+.how-it-works-title {
+  color: #ffffff;
+}
+
+.hero-desc {
+  margin-top: 1.5rem;
+  font-size: 1.15rem;
+  color: var(--color-text-muted);
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+.how-it-works-desc {
+  font-size: 1rem;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 3.5rem;
+}
+
+.step-card {
+  background-color: rgba(24, 8, 50, 0.8);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  transition: all 0.25s ease;
+}
+
+.step-card:hover {
+  border-color: rgba(128, 255, 114, 0.4);
+  transform: translateY(-4px);
+}
+
+.step-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-neon-primary);
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.step-icon-emoji {
+  font-size: 1.25rem;
+}
+
+.step-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+}
+
+.step-desc {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
