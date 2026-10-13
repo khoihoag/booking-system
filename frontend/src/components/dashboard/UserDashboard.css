@@ -1,0 +1,287 @@
+/* ==========================================================================
+   PitchBook - Player Dashboard Stylesheet (user-dashboard.css)
+   ========================================================================== */
+
+@import './../../common.css';
+
+.dashboard-container {
+  display: flex;
+  min-height: calc(100vh - 80px);
+}
+
+.dash-sidebar {
+  width: 260px;
+  background-color: var(--bg-midnight);
+  border-right: 1px solid var(--border-neon-subtle);
+  padding: 1.75rem 1.25rem;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.dash-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.dash-nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.dash-nav-item.active {
+  background-color: var(--color-neon-primary);
+  color: var(--bg-midnight);
+  font-weight: 700;
+}
+
+.dash-main {
+  flex: 1;
+  background-color: var(--color-light-bg);
+  color: var(--color-dark-text);
+  padding: 2.5rem;
+}
+
+.fixture-card {
+  background-color: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+/* Data Tables */
+.data-table-wrapper {
+  background-color: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  box-shadow: var(--shadow-card);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8125rem;
+}
+
+.data-table th {
+  background-color: #F9FAFB;
+  color: #6B7280;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.data-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #F3F4F6;
+  color: var(--color-dark-text);
+}
+
+.data-table tr:hover td {
+  background-color: #F9FAFB;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+  .dash-sidebar {
+    width: 100%;
+  }
+  .dash-main {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* User Dashboard Component Styles */
+.nav-user-badge {
+  font-size: 0.8125rem;
+  color: var(--color-neon-primary);
+  font-family: var(--font-mono);
+}
+
+.nav-signout-btn {
+  font-size: 0.75rem;
+}
+
+.dash-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.dash-user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--color-neon-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: var(--color-neon-primary);
+}
+
+.dash-user-name {
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.dash-user-email {
+  font-size: 0.6875rem;
+  color: rgba(210, 201, 224, 0.7);
+}
+
+.dash-sidebar-action {
+  margin-top: 3rem;
+}
+
+.dash-sidebar-action .btn-primary {
+  width: 100%;
+  text-align: center;
+}
+
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.dash-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+}
+
+.dash-subtitle {
+  font-size: 0.8125rem;
+  color: #6B7280;
+  margin-top: 0.25rem;
+}
+
+.dash-header-btn {
+  color: var(--color-neon-primary);
+}
+
+.dash-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.dash-history-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+}
+
+.fixture-header-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.fixture-code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-electric-blue);
+  background-color: #EFF6FF;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.fixture-format {
+  font-size: 0.75rem;
+  color: #6B7280;
+}
+
+.fixture-venue-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.fixture-venue-location {
+  font-size: 0.8125rem;
+  color: #4B5563;
+  margin-top: 0.25rem;
+}
+
+.fixture-time-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  color: #1F2937;
+}
+
+.fixture-meta-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.fixture-price {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+.fixture-btn-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.fixture-view-btn {
+  font-size: 0.75rem;
+  padding: 0.4rem 0.85rem;
+  color: var(--color-dark-text);
+  border-color: #D1D5DB;
+}
+
+.fixture-qr-btn {
+  font-size: 0.75rem;
+  padding: 0.4rem 0.85rem;
+}
+
+.table-code-cell {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.table-price-cell {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.table-rebook-link {
+  color: var(--color-electric-blue);
+  text-decoration: underline;
+}
+
