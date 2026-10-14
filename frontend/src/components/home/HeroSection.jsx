@@ -24,12 +24,12 @@ export default function () {
                 <div className="search-card">
                     <form className="search-form" action="discovery.html" method="GET">
                         <div className="form-group">
-                            <label className="form-label" for="loc">Location / District</label>
+                            <label className="form-label" htmlFor="loc">Location / District</label>
                             <input className="form-input" id="loc" name="location" type="text" placeholder="e.g. District 2, Hanoi..." />
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" for="type">Pitch Type</label>
+                            <label className="form-label" htmlFor="type">Pitch Type</label>
                             <select className="form-select" id="type" name="pitchType">
                                 <option value="all">All Formats (5 / 7 / 11)</option>
                                 <option value="5-a-side">5-a-side Futsal</option>
@@ -39,8 +39,8 @@ export default function () {
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" for="date">Match Date</label>
-                            <input className="form-input" id="date" name="date" type="date" value="2026-10-10" />
+                            <label className="form-label" htmlFor="date">Match Date</label>
+                            <input className="form-input" id="date" name="date" type="date" defaultValue="2026-10-10" />
                         </div>
 
                         <div className="form-group search-form-btn-group">
