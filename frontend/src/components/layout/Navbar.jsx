@@ -1,22 +1,12 @@
 import './Navbar.css'
-
+import PitchLogo from '../common/PitchLogo'
 
 export default function() {
     return (
         <>
             <header className="navbar">
                 <div className="container navbar-container">
-                    <a href="index.html" className="brand-logo">
-                        <div className="brand-emblem">
-                        <div className="brand-pitch-mark">
-                            <div className="brand-pitch-line"></div>
-                            <div className="brand-pitch-circle"></div>
-                        </div>
-                        </div>
-                        <div className="brand-text">
-                            <span>Pitch</span><span className="brand-text-green">Book</span>
-                        </div>
-                    </a>    
+                    {<PitchLogo />}    
 
                     <nav className="nav-links">
                         <a href="discovery.html" className="nav-link">Find a Pitch</a>

@@ -1,3 +1,4 @@
+import './OwnerDashboard.css'
 export default function () {
     return (
         <>
