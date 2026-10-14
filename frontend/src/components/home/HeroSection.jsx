@@ -2,6 +2,7 @@ import './HeroSection.css'
 
 export default function () {
     return (
+        <div className='bg-grid-cyber'>
         <section className="hero-section">
             <div className="hero-glow-blue"></div>
             <div className="hero-glow-green"></div>
@@ -69,5 +70,6 @@ export default function () {
                 </div>
             </div>
         </section>
+        </div>
     )
 }

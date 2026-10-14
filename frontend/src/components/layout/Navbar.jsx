@@ -1,12 +1,14 @@
 import './Navbar.css'
 import PitchLogo from '../common/PitchLogo'
+import { Link } from 'react-router-dom'
 
-export default function() {
+
+export default function () {
     return (
         <>
             <header className="navbar">
                 <div className="container navbar-container">
-                    {<PitchLogo />}    
+                    {<PitchLogo />}
 
                     <nav className="nav-links">
                         <a href="discovery.html" className="nav-link">Find a Pitch</a>
@@ -19,7 +21,10 @@ export default function() {
                         <span className="nav-user-badge">
                             Player: Khoi Hoang
                         </span>
-                        <a href="signin.html" className="btn-dark nav-signout-btn">Sign Out</a>
+                        <Link to='/discovery'>
+                            <button className='btn-primary'>Book a Pitch</button>
+                        </Link>
+
                     </div>
                 </div>
             </header>

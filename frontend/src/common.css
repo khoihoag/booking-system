@@ -284,6 +284,7 @@ button, input, select, textarea {
   transition: border-color 0.2s ease;
 }
 
+
 .form-input:focus, .form-select:focus {
   border-color: var(--color-neon-primary);
 }

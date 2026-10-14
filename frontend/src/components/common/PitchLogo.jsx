@@ -1,4 +1,5 @@
 import './../../common.css'
+import { Link } from 'react-router-dom'
 
 export default function () {
     return (
@@ -10,9 +11,11 @@ export default function () {
                     <div className="brand-pitch-circle"></div>
                 </div>
             </div>
-            <div className="brand-text">
+
+            <Link to="/" className="brand-text">
                 <span className='pitch-text'>Pitch</span><span className="brand-text-green">Book</span>
-            </div>
+            </Link>
+
 
         </div>
     )

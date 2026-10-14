@@ -3,36 +3,7 @@ import './Discovery.css'
 export default function () {
     return (
         <div className="discovery-body">
-            {/*navbar*/}
-            <header class="navbar">
-                <div class="container navbar-container">
-                    <a href="index.html" class="brand-logo">
-                        <div class="brand-emblem">
-                            <div class="brand-pitch-mark">
-                                <div class="brand-pitch-line"></div>
-                                <div class="brand-pitch-circle"></div>
-                            </div>
-                        </div>
-                        <div class="brand-text">
-                            <span className='pitch-text'>Pitch</span>
-                            <span class="brand-text-green">Book</span>
-                        </div>
-                    </a>
-
-                    <nav class="nav-links">
-                        <a href="discovery.html" class="nav-link active">Find a Pitch</a>
-                        <a href="index.html#how-it-works" class="nav-link">How It Works</a>
-                        <a href="owner-dashboard.html" class="nav-link">For Pitch Owners</a>
-                        <a href="user-dashboard.html" class="nav-link">My Dashboard</a>
-                    </nav>
-
-                    <div class="nav-actions">
-                        <a href="signin.html" class="nav-link">Sign In</a>
-                        <a href="user-dashboard.html" class="btn-primary">My Fixtures</a>
-                    </div>
-                </div>
-            </header>
-
+        
             {/*<!-- Dark Sub-Header Banner -->*/}
             <div class="top-subbar">
                 <div class="container">
@@ -256,59 +227,6 @@ export default function () {
                     </main>
                 </div>
             </div>
-            {/*footer*/}
-            <footer class="footer">
-                <div class="container">
-                    <div class="footer-grid">
-                        <div>
-                            <a href="index.html" class="brand-logo">
-                                <div class="brand-emblem">
-                                    <div class="brand-pitch-mark">
-                                        <div class="brand-pitch-line"></div>
-                                        <div class="brand-pitch-circle"></div>
-                                    </div>
-                                </div>
-                                <div class="brand-text">
-                                    <span>Pitch</span><span class="brand-text-green">Book</span>
-                                </div>
-                            </a>
-                            <p class="footer-brand-desc">
-                                The premier football pitch booking and sports facility management network across Vietnam.
-                            </p>
-                        </div>
-
-                        <div>
-                            <h4 class="footer-heading">For Players</h4>
-                            <ul class="footer-links">
-                                <li><a href="discovery.html">Find Football Pitches</a></li>
-                                <li><a href="discovery.html?pitchType=5-a-side">5-a-side Futsal Arenas</a></li>
-                                <li><a href="discovery.html?pitchType=7-a-side">7-a-side Artificial Turf</a></li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 class="footer-heading">For Venues</h4>
-                            <ul class="footer-links">
-                                <li><a href="owner-dashboard.html">Pitch Owner Dashboard</a></li>
-                                <li><a href="owner-dashboard.html">List a Football Field</a></li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 class="footer-heading">Support</h4>
-                            <ul class="footer-links footer-meta-links">
-                                <li>support@pitchbook.vn</li>
-                                <li>+84 (0) 28 3822 0000</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="footer-bottom">
-                        <div>&copy; 2026 PitchBook Technologies Ltd. All rights reserved.</div>
-                    </div>
-                </div>
-            </footer>
-
         </div>
     )
 }

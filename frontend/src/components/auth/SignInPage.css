@@ -5,7 +5,7 @@
 @import '../../common.css';
 
 .auth-wrapper {
-  min-height: 100vh;
+  min-height: 91vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -152,3 +152,80 @@
   font-weight: 700;
 }
 
+.signin-field-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.signin-input-wrapper {
+  position: relative;
+}
+
+.signin-input {
+  width: 100%;
+  height: 2.75rem;
+  background-color: var(--bg-midnight);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  padding-left: 2.25rem;
+  padding-right: 0.75rem;
+  font-size: 0.875rem;
+  color: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.signin-input-password {
+  padding-right: 2.5rem;
+}
+
+.signin-footer-link {
+  color: var(--color-neon-primary);
+  font-weight: 700;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 0.25rem;
+}
+
+.signin-footer-link:hover {
+  text-decoration: underline;
+}
+
+
+.signin-forgot-btn {
+  font-size: 0.6875rem;
+  color: var(--color-neon-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.signin-forgot-btn:hover {
+  text-decoration: underline;
+}
+
+.signin-input-icon {
+  width: 1rem;
+  height: 1rem;
+  color: rgba(210, 201, 224, 0.5);
+  position: absolute;
+  left: 0.75rem;
+  top: 0.875rem;
+  pointer-events: none;
+}
+
+.signin-toggle-pw-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 0.875rem;
+  background: none;
+  border: none;
+  color: rgba(210, 201, 224, 0.6);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
