@@ -2,8 +2,11 @@ import "./SignInPage.css";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, ArrowRight } from "lucide-react";
 import { useState } from "react";
+import PitchBookLogo from "../common/PitchBookLogo";
+import { useNavigate } from "react-router-dom";
 
 export default function SignIn() {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -11,23 +14,11 @@ export default function SignIn() {
     <div className="bg-grid-cyber">
       <div className="auth-wrapper">
         <div className="auth-glow"></div>
-
         <div className="auth-header">
-          <a
-            href="index.html"
-            className="brand-logo"
-          >
-            <div className="brand-emblem">
-              <div className="brand-pitch-mark">
-                <div className="brand-pitch-line"></div>
-                <div className="brand-pitch-circle"></div>
-              </div>
+            <div className="signin-logo-wrap">
+              <PitchBookLogo size="lg" onClick={() => navigate('/')} />
             </div>
-            <div className="brand-text">
-              <span>Pitch</span>
-              <span className="brand-text-green">Book</span>
-            </div>
-          </a>
+        
           <h1 className="font-display auth-title">Sign in to PitchBook</h1>
           <p className="auth-subtitle">
             Access match fixtures, venue schedules, and squad bookings

@@ -11,7 +11,7 @@ import OwnerDashboard from './components/dashboard/OwnerDashboard'
 import AdminDashboard from './components/dashboard/AdminDashboard'
 import Discovery from './components/discovery/Discovery'
 import PitchDetails from './components/pitch/PitchDetails'
-import PitchLogo from './components/common/PitchLogo'
+import PitchBookLogo from './components/common/PitchBookLogo'
 
 
 

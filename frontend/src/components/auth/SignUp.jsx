@@ -10,6 +10,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import "./SignUpPage.css";
 import { useState } from "react";
+import PitchBookLogo from "../common/PitchBookLogo";
 
 export default function signup() {
   const navigate = useNavigate();
@@ -46,21 +47,12 @@ export default function signup() {
         <div className="auth-glow"></div>
 
         <div className="auth-header">
-          <a
-            href="index.html"
-            className="brand-logo"
-          >
-            <div className="brand-emblem">
-              <div className="brand-pitch-mark">
-                <div className="brand-pitch-line"></div>
-                <div className="brand-pitch-circle"></div>
-              </div>
-            </div>
-            <div className="brand-text">
-              <span>Pitch</span>
-              <span className="brand-text-green">Book</span>
-            </div>
-          </a>
+          <div className="signup-logo-wrap">
+            <PitchBookLogo
+              size="lg"
+              onClick={() => navigate("/")}
+            />
+          </div>
           <h1 className="font-display auth-title">Create Player Account</h1>
           <p className="auth-subtitle">
             Join footballers reserving pitches across Vietnam
@@ -68,12 +60,7 @@ export default function signup() {
         </div>
 
         <div className="auth-card">
-            { errorMsg && (
-                <div className="signup-error-banner">
-                    {errorMsg}
-                </div>
-            )
-            }
+          {errorMsg && <div className="signup-error-banner">{errorMsg}</div>}
           <form
             className="auth-form"
             onSubmit={handleCreateAccount}
@@ -92,7 +79,7 @@ export default function signup() {
                   id="name"
                   type="text"
                   placeholder="Khoi Hoang"
-                  onChange={(e) => (setFullName(e.target.value))}
+                  onChange={(e) => setFullName(e.target.value)}
                   required
                 />
                 <UserIcon className="signup-input-icon" />
@@ -112,7 +99,7 @@ export default function signup() {
                   id="signup-email"
                   type="email"
                   placeholder="name@example.com"
-                  onChange={(e) => (setEmail(e.target.value))}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
                 <Mail className="signup-input-icon" />
@@ -132,7 +119,7 @@ export default function signup() {
                   type={showPassword ? "text" : "password"}
                   id="signup-pass"
                   placeholder="Minimum 6 characters"
-                  onChange={(e) => (setPassword(e.target.value))}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                 />
                 <Lock className="signup-input-icon" />
@@ -159,7 +146,7 @@ export default function signup() {
                   id="confirm-pass"
                   type="password"
                   placeholder="Re-enter password"
-                  onChange={(e) => (setConfirmPassword(e.target.value))}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
                 <Lock className="signup-input-icon" />

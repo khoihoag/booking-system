@@ -1,14 +1,29 @@
 import './Navbar.css'
-import PitchLogo from '../common/PitchLogo'
+import PitchBookLogo from '../common/PitchBookLogo'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+
 
 
 export default function () {
+    const navigate = useNavigate()
+    const handleNavClick = (page, hash) => {
+        console.log(1)
+        navigate(page)
+        if (hash) {
+            setTimeout(() => {
+                const el = document.getElementById(hash);
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
     return (
         <>
             <header className="navbar">
                 <div className="container navbar-container">
-                    {<PitchLogo />}
+                    {<PitchBookLogo onClick={() => handleNavClick('/')}/>}
 
                     <nav className="nav-links">
                         <a href="discovery.html" className="nav-link">Find a Pitch</a>
