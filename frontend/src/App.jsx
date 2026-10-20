@@ -11,11 +11,10 @@ import OwnerDashboard from './components/dashboard/OwnerDashboard'
 import AdminDashboard from './components/dashboard/AdminDashboard'
 import Discovery from './components/discovery/Discovery'
 import PitchDetails from './components/pitch/PitchDetails'
+import {AppProvider, useApp} from './context/AppContext'
 import PitchBookLogo from './components/common/PitchBookLogo'
 
-
-
-export default function App() {
+const AppContent = () => {
     return (
         <BrowserRouter>
             <Navbar />
@@ -31,5 +30,13 @@ export default function App() {
             </Routes>
             <Footer />
         </BrowserRouter >
+    )
+}
+
+export default function App() {
+    return (
+        <AppProvider>
+            <AppContent />
+        </AppProvider>
     )
 }
