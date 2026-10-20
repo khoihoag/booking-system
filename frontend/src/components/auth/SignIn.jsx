@@ -4,9 +4,13 @@ import { Eye, EyeOff, Lock, Mail, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import PitchBookLogo from "../common/PitchBookLogo";
 import { useNavigate } from "react-router-dom";
+import { useApp } from "../../context/AppContext";
+
 
 export default function SignIn() {
+  const { setCurrentUser } = useApp()
   const navigate = useNavigate()
+  const [email, setEmail] = useState("")
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -46,6 +50,7 @@ export default function SignIn() {
                   id="email"
                   type="email"
                   required
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <Mail className="signin-input-icon" />
               </div>
@@ -93,6 +98,7 @@ export default function SignIn() {
               <button
                 className="btn-primary auth-submit-btn"
                 type="submit"
+                onClick={() => setCurrentUser({"email": email })}
               >
                 Sign In &rarr;
               </button>

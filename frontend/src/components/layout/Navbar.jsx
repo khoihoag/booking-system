@@ -2,10 +2,12 @@ import './Navbar.css'
 import PitchBookLogo from '../common/PitchBookLogo'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
+import { useApp } from '../../context/AppContext'
 
 
 
 export default function () {
+    const {currentUser} = useApp()
     const navigate = useNavigate()
     const handleNavClick = (page, hash) => {
         console.log(1)
@@ -34,7 +36,8 @@ export default function () {
 
                     <div className="nav-actions">
                         <span className="nav-user-badge">
-                            Player: Khoi Hoang
+                            {currentUser ? "caca" : "Player: Khoi Hoang"}
+                            {console.log(currentUser)}
                         </span>
                         <Link to='/discovery'>
                             <button className='btn-primary'>Book a Pitch</button>
