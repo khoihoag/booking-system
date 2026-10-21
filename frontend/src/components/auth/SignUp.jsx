@@ -64,7 +64,6 @@ export default function signup() {
           <form
             className="auth-form"
             onSubmit={handleCreateAccount}
-            method="GET"
           >
             <div className="signup-field-group">
               <label

@@ -6,23 +6,41 @@ import PitchBookLogo from "../common/PitchBookLogo";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 
-
 export default function SignIn() {
-  const { setCurrentUser } = useApp()
-  const navigate = useNavigate()
-  const [email, setEmail] = useState("")
+  const { setCurrentUser } = useApp();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
+
+  const handleSignIn = (e) => {
+    e.preventDefault();
+    setErrorMsg("");
+
+    if (!email || !password) {
+      setErrorMsg("All fields are required.");
+      return;
+    }
+    if (password.length < 6) {
+      setErrorMsg("Password must be at least 6 characters long.");
+      return;
+    }
+
+    navigate("/");
+  };
 
   return (
     <div className="bg-grid-cyber">
       <div className="auth-wrapper">
         <div className="auth-glow"></div>
         <div className="auth-header">
-            <div className="signin-logo-wrap">
-              <PitchBookLogo size="lg" onClick={() => navigate('/')} />
-            </div>
-        
+          <div className="signin-logo-wrap">
+            <PitchBookLogo
+              size="lg"
+              onClick={() => navigate("/")}
+            />
+          </div>
+
           <h1 className="font-display auth-title">Sign in to PitchBook</h1>
           <p className="auth-subtitle">
             Access match fixtures, venue schedules, and squad bookings
@@ -32,8 +50,7 @@ export default function SignIn() {
         <div className="auth-card">
           <form
             className="auth-form"
-            action="user-dashboard.html"
-            method="GET"
+            onSubmit={handleSignIn}
           >
             <div className="signin-field-group">
               <label
@@ -94,15 +111,13 @@ export default function SignIn() {
               </div>
             </div>
 
-            <Link to="/">
-              <button
-                className="btn-primary auth-submit-btn"
-                type="submit"
-                onClick={() => setCurrentUser({"email": email })}
-              >
-                Sign In &rarr;
-              </button>
-            </Link>
+            <button
+              className="btn-primary auth-submit-btn"
+              type="submit"
+              // onClick={() => setCurrentUser()}
+            >
+              Sign In &rarr;
+            </button>
           </form>
           <div className="auth-footer-prompt">
             Don't have an account yet?
