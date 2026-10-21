@@ -12,6 +12,7 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSignIn = (e) => {
     e.preventDefault();
@@ -48,6 +49,7 @@ export default function SignIn() {
         </div>
 
         <div className="auth-card">
+          {errorMsg && <div className="signin-error-banner">{errorMsg}</div>}
           <form
             className="auth-form"
             onSubmit={handleSignIn}
