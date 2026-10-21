@@ -44,12 +44,11 @@ export default function () {
           {<PitchBookLogo onClick={() => handleNavClick("/")} />}
 
           <nav className="nav-links">
-            <a
-              href="discovery.html"
+            <Link to='/discovery'
               className="nav-link"
             >
               Find a Pitch
-            </a>
+            </Link>
             <a
               href="owner-dashboard.html"
               className="nav-link"
