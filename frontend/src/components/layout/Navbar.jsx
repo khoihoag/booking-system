@@ -49,12 +49,11 @@ export default function () {
             >
               Find a Pitch
             </Link>
-            <a
-              href="owner-dashboard.html"
+            <Link to='/owner'
               className="nav-link"
             >
               Owner Console
-            </a>
+            </Link>
             <a
               href="admin-dashboard.html"
               className="nav-link"
