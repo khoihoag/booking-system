@@ -1,10 +1,11 @@
 import "./SignInPage.css";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PitchBookLogo from "../common/PitchBookLogo";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
+import axios from 'axios'
 
 export default function SignIn() {
   const { setCurrentUser } = useApp();
@@ -13,6 +14,15 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isSubmitted, setSubmitted] = useState(false)
+
+  useEffect(async () => {
+    const response = await axios.get("/api/user/login", {
+      email: email,
+      password: password
+    })
+    console.log(response.data) 
+  }, [isSubmitted])
 
   const handleSignIn = (e) => {
     e.preventDefault();
@@ -26,7 +36,8 @@ export default function SignIn() {
       setErrorMsg("Password must be at least 6 characters long.");
       return;
     }
-
+    setSubmitted(true)
+    console.log('asfa')
     navigate("/");
   };
 
