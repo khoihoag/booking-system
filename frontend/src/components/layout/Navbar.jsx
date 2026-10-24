@@ -118,7 +118,7 @@ export default function () {
                         <span>My Dashboard</span>
                       </button>
 
-                      {/* Switch Persona option */}
+                      {/* Switch Persona option
                       <div className="dropdown-section-heading">
                         Switch Persona (Demo)
                       </div>
@@ -162,7 +162,7 @@ export default function () {
                           color="#60A5FA"
                         />
                         <span style={{ color: "#93C5FD" }}>Super Admin</span>
-                      </button>
+                      </button> */}
 
                       <div
                         style={{
