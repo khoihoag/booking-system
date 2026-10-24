@@ -20,7 +20,6 @@ export default function () {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const handleNavClick = (page, hash) => {
-    console.log(1);
     navigate(page);
     if (hash) {
       setTimeout(() => {
@@ -197,7 +196,6 @@ export default function () {
               
                
             )}
-              {console.log(currentUser)}
             </span>
             <Link to="/discovery">
               <button className="btn-primary">Book a Pitch</button>

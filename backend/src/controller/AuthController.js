@@ -15,7 +15,7 @@ const createSendToken = (user, statusCode, token, res) => {
     res.status(statusCode).json({
         status: 'success',
         token,
-        data: user
+        user: user
     })
 }
 
@@ -29,6 +29,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 exports.login = catchAsync(async (req, res, next) => {
     const { email, password } = req.body
     const { user, token } = await authServices.login(email, password)
+    console.log(email + " " + password)
     createSendToken(user, 200, token, res)
 })
 

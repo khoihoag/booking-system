@@ -1,7 +1,7 @@
 import "./SignInPage.css";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, ArrowRight } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PitchBookLogo from "../common/PitchBookLogo";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
@@ -14,17 +14,8 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const [isSubmitted, setSubmitted] = useState(false)
 
-  useEffect(async () => {
-    const response = await axios.get("/api/user/login", {
-      email: email,
-      password: password
-    })
-    console.log(response.data) 
-  }, [isSubmitted])
-
-  const handleSignIn = (e) => {
+  const  handleSignIn = async (e) => {
     e.preventDefault();
     setErrorMsg("");
 
@@ -36,9 +27,23 @@ export default function SignIn() {
       setErrorMsg("Password must be at least 6 characters long.");
       return;
     }
-    setSubmitted(true)
-    console.log('asfa')
-    navigate("/");
+    try {
+      const response = await axios.post("/api/user/login", {
+        email: email,
+        password: password
+      })
+      const resUser = response.data.user
+      setCurrentUser({
+        id: resUser.id,
+        email: resUser.email,
+        name: resUser.name,
+        role: resUser.role
+      })
+      navigate("/");
+    } catch(err) {
+      setErrorMsg(err.response?.data?.message || "DDD")
+      console.log("err" + err)
+    }
   };
 
   return (
