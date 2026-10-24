@@ -11,6 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./SignUpPage.css";
 import { useState } from "react";
 import PitchBookLogo from "../common/PitchBookLogo";
+import axios from "axios";
 
 export default function signup() {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export default function signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleCreateAccount = (e) => {
+  const handleCreateAccount = async (e) => {
     e.preventDefault();
     setErrorMsg("");
 
@@ -29,8 +30,8 @@ export default function signup() {
       setErrorMsg("All fields are required.");
       return;
     }
-    if (password.length < 6) {
-      setErrorMsg("Password must be at least 6 characters long.");
+    if (password.length < 8) {
+      setErrorMsg("Password must be at least 8 characters long.");
       return;
     }
 
@@ -38,7 +39,18 @@ export default function signup() {
       setErrorMsg("Passwords do not match.");
       return;
     }
-    navigate("/");
+
+    try {
+      const response = await axios.post("/api/user/signup", {
+        name: fullName,
+        email: email,
+        password: password,
+        password_confirm: confirmPassword
+      })
+      navigate("/signin");
+    } catch (err) {
+      setErrorMsg(err.response?.data?.message || "create account failed")
+    }
   };
 
   return (
@@ -68,7 +80,7 @@ export default function signup() {
             <div className="signup-field-group">
               <label
                 className="form-label"
-                for="name"
+                htmlFor="name"
               >
                 Full Name
               </label>
@@ -88,7 +100,7 @@ export default function signup() {
             <div className="signup-field-group">
               <label
                 className="form-label"
-                for="signup-email"
+                htmlFor="signup-email"
               >
                 Email Address
               </label>
@@ -108,7 +120,7 @@ export default function signup() {
             <div className="signup-field-group">
               <label
                 className="form-label"
-                for="signup-pass"
+                htmlFor="signup-pass"
               >
                 Password
               </label>
@@ -117,7 +129,7 @@ export default function signup() {
                   className="signup-input"
                   type={showPassword ? "text" : "password"}
                   id="signup-pass"
-                  placeholder="Minimum 6 characters"
+                  placeholder="Minimum 8 characters"
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
@@ -135,7 +147,7 @@ export default function signup() {
             <div className="signup-field-group">
               <label
                 className="form-label"
-                for="confirm-pass"
+                htmlFor="confirm-pass"
               >
                 Confirm Password
               </label>
