@@ -4,6 +4,9 @@ const AppError = require('./../utils/AppError')
 
 
 exports.createPitch = catchAsync(async (req, res) => {
+    if (!req.body.ownerId && req.user) {
+        req.body.ownerId = req.user.id || req.user._id
+    }
     const pitch = await pitchServices.createPitch(req.body)
 
     res.status(201).json({
@@ -29,21 +32,19 @@ exports.getPitchesByUser = catchAsync(async (req, res, next) => {
 exports.getAllPitches = catchAsync(async (req, res) => {
     const pitches = await pitchServices.findAllPitches()
 
-
     if (!pitches) {
         return next(new AppError("No pitch found with ", 404))
     }
 
     res.status(200).json({
         status: 'success',
+        results: pitches.length,
         data: pitches
     })
 })
 
 exports.getPitchById = catchAsync(async (req, res, next) => {
-
     const pitch = await pitchServices.findPitchById(req.params.id)
-
     
     if (!pitch) {
         return next(new AppError("No pitch found with that ID", 404))
@@ -55,11 +56,11 @@ exports.getPitchById = catchAsync(async (req, res, next) => {
     })
 })
 
-exports.updatePitch = catchAsync(async (req, res) => {
+exports.updatePitch = catchAsync(async (req, res, next) => {
     const pitch = await pitchServices.updatePitch(req.params.id, req.body)
 
     if (!pitch) {
-        return netx(new AppError("No pitch found with that ID", 404))
+        return next(new AppError("No pitch found with that ID", 404))
     }
 
     res.status(200).json({
@@ -68,12 +69,11 @@ exports.updatePitch = catchAsync(async (req, res) => {
     })
 })
 
-exports.deletePitch = catchAsync(async (req, res) => {
-
+exports.deletePitch = catchAsync(async (req, res, next) => {
     const pitch = await pitchServices.deletePitch(req.params.id)
 
     if (!pitch) {
-        return next(new AppError("No tour found with that ID", 404))
+        return next(new AppError("No pitch found with that ID", 404))
     }
 
     res.status(204).send()
