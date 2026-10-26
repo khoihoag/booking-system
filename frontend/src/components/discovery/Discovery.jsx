@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useApp } from "../../context/AppContext";
 import {
   Search,
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import "./Discovery.css";
 import { initialPitches } from "../../data/Pitches";
+import axios from 'axios'
 
 const allFacilities = [
   "LED Floodlights",
@@ -32,6 +33,17 @@ const allFacilities = [
 export default function () {
   const { viewPitchDetails } = useApp();
   const displayedPitches = initialPitches;
+  const  [pitches, setPitches] = useState([])
+  const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    axios.get("/api/pitch").then((res) => {
+      const pitchesRes = res.data;
+      setPitches(pitchesRes.data)
+    }).catch(err => setErrorMsg(err.response?.data?.message))
+  }, [])
+  console.log(pitches)
+
 
   return (
     <div className="discovery-page">
@@ -194,7 +206,7 @@ export default function () {
 
             {/* Populated Pitches Grid */}
             <div className="discovery-cards-grid">
-              {displayedPitches.map((pitch) => (
+              {pitches.map((pitch) => (
                 <div
                   key={pitch.id}
                   className="discovery-pitch-card"
