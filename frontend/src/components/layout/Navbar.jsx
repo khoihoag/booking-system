@@ -1,6 +1,6 @@
 import "./Navbar.css";
 import PitchBookLogo from "../common/PitchBookLogo";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import {
@@ -43,25 +43,26 @@ export default function () {
           {<PitchBookLogo onClick={() => handleNavClick("/")} />}
 
           <nav className="nav-links">
-            <Link to='/discovery'
-              className="nav-link"
+            {/* <Link to='/discovery'
+              className="navbar-link-btn active"
             >
               Find a Pitch
-            </Link>
+            </Link> */}
+            <NavLink to='/discovery' className={({isActive}) => isActive ? "navbar-link-btn active" : "navbar-link-btn"}>Find a Pitch</NavLink>
             <Link to='/owner'
-              className="nav-link"
+              className="navbar-link-btn"
             >
               Owner Console
             </Link>
             <a
               href="admin-dashboard.html"
-              className="nav-link"
+              className="navbar-link-btn"
             >
               Admin Console
             </a>
             <a
               href="user-dashboard.html"
-              className="nav-link"
+              className="navbar-link-btn"
             >
               Player Dashboard
             </a>
