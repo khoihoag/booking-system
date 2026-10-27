@@ -103,7 +103,7 @@ pitchSchema.virtual('pitch_type')
         else this.pitchType = '7-a-side'
     })
 
-pitchSchema.pre('save', function (next) {
+pitchSchema.pre('save', function () {
     if (!this.id && this._id) {
         this.id = this._id.toString()
     }
@@ -115,7 +115,6 @@ pitchSchema.pre('save', function (next) {
     if (this.pricePerHour === undefined && this.price !== undefined) {
         this.pricePerHour = this.price
     }
-    next()
 })
 
 pitchSchema.virtual('time_slots', {

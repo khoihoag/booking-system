@@ -83,7 +83,7 @@ describe('Test các API của ứng dụng (Database Memory Server)', () => {
       const response = await request(app).post('/api/user/signup').send(ownerUser);
       expect(response.status).toBe(201);
       pitchOwnerToken = response.body.token;
-      pitchOwnerId = response.body.data._id || response.body.data.id;
+      pitchOwnerId = response.body.user._id || response.body.user.id;
 
       // Update role
       const User = mongoose.model('users');
