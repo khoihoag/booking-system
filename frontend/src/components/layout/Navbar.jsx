@@ -60,12 +60,11 @@ export default function () {
             >
               Admin Console
             </a>
-            <a
-              href="user-dashboard.html"
+            <Link to='/dashboard'
               className="navbar-link-btn"
             >
               Player Dashboard
-            </a>
+            </Link>
           </nav>
 
           <div className="nav-actions">

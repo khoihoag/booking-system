@@ -45,7 +45,9 @@ const UserSchema = new mongoose.Schema({
         default: true,
         select: false,
     }
-}) 
+},{
+        id: false // Bảo Mongoose không tạo getter ảo 'id' nữa
+    }) 
 
 UserSchema.virtual('pitches', {
     ref: 'pitches',

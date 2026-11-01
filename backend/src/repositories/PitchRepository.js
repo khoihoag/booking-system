@@ -12,7 +12,9 @@ exports.findOne = async (filter) => {
     }
     return await Pitch.findOne(queryFilter).populate({
         path: 'ownerId',
-        select: ['name', 'email', '-_id']
+        select: 'name email -_id'
+    }).populate({
+        path: 'timeSlots'
     })
 }
 
