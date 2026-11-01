@@ -14,6 +14,11 @@ const pitchSchema = new mongoose.Schema(
             ref: 'users',
             required: true
         },
+        timeSlots: {
+            type: Schema.Types.ObjectId,
+            ref: 'time_slots',
+            required: true
+        },
         imageUrl: {
             type: String,
             default: ''

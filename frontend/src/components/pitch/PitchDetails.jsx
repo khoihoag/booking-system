@@ -1,278 +1,572 @@
-import './PitchDetails.css'
+import "./PitchDetails.css";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useApp } from "../../context/AppContext";
+import {
+  MapPin,
+  Star,
+  Calendar,
+  Clock,
+  CheckCircle2,
+  ChevronLeft,
+} from "lucide-react";
+import axios from "axios";
 
 export default function () {
-    return (
-        <div class="details-body">
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { currentUser } = useApp() || {};
+  const [pitch, setPitch] = useState(undefined);
+  const [activeImage, setActiveImage] = useState();
+  const [selectedSlotIds, setSelectedSlotIds] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const sampleTimeSlots = [];
 
-            {/*<!-- Navigation Bar -->*/}
-            <header class="navbar">
-                <div class="container navbar-container">
-                    <a href="index.html" class="brand-logo">
-                        <div class="brand-emblem">
-                            <div class="brand-pitch-mark">
-                                <div class="brand-pitch-line"></div>
-                                <div class="brand-pitch-circle"></div>
-                            </div>
-                        </div>
-                        <div class="brand-text">
-                            <span className='pitch-text'>Pitch</span><span class="brand-text-green">Book</span>
-                        </div>
-                    </a>
+  useEffect(() => {
+    axios
+      .get(`/api/pitch/${id}`)
+      .then((res) => {
+        const pitchRes = res.data;
+        setPitch(pitchRes.data);
+        setActiveImage(pitchRes.data?.imageUrl);
+      })
+      .catch((err) => {
+        console.log(err.response?.data?.message);
+      });
+  }, [id]);
 
-                    <nav class="nav-links">
-                        <a href="discovery.html" class="nav-link">Find a Pitch</a>
-                        <a href="index.html#how-it-works" class="nav-link">How It Works</a>
-                        <a href="owner-dashboard.html" class="nav-link">For Pitch Owners</a>
-                        <a href="user-dashboard.html" class="nav-link">My Dashboard</a>
-                    </nav>
+  const handleSlotToggle = (slotId, isBooked) => {
+    if (isBooked) return;
+    setSelectedSlotIds((prev) =>
+      prev.includes(slotId)
+        ? prev.filter((item) => item !== slotId)
+        : [...prev, slotId]
+    );
+  };
 
-                    <div class="nav-actions">
-                        <a href="signin.html" class="nav-link">Sign In</a>
-                        <a href="user-dashboard.html" class="btn-primary">Book Now</a>
-                    </div>
-                </div>
-            </header>
+  const handleConfirmBooking = () => {
+    setShowModal(true);
+  };
 
-            {/*<!-- Top Dark Bar -->*/}
-            <div class="details-topbar">
-                <div class="container details-topbar-container">
-                    <a href="discovery.html" class="details-back-link">
-                        &larr; Back to Pitch Directory
-                    </a>
-                    <div class="details-facility-id">
-                        Verified Facility ID: <span class="facility-id-code">VN-HCM-D2-09</span>
-                    </div>
-                </div>
-            </div>
+  const totalPrice = selectedSlotIds.length * (pitch?.pricePerHour || 0);
 
-            <div class="container">
-                <div class="details-layout">
-                    {/*<!-- Main Content Left Column -->*/}
-                    <main>
-                        {/*<!-- Photo Gallery -->*/}
-                        <div class="gallery-main">
-                            <img src="assets/images/pitch_artificial_turf_night_1791520790793.jpg" alt="Apex Cyber Stadium Main View" />
-                        </div>
+  console.log(pitch);
+  if (!pitch) {
+    return <div className="loading">Đang tải thông tin sân bóng...</div>;
+  }
+  return (
+    <div className="pitch-details-page">
+      {/* Breadcrumb Bar */}
+      <div className="pitch-top-bar">
+        <div className="pitch-top-bar-inner">
+          <button
+            onClick={() => navigate("/discovery")}
+            className="pitch-back-btn"
+          >
+            <ChevronLeft style={{ width: 16, height: 16 }} />
+            <span>Back to Discovery</span>
+          </button>
 
-                        <div class="gallery-thumbs">
-                            <div class="thumb-item active">
-                                <img src="assets/images/pitch_artificial_turf_night_1791520790793.jpg" alt="Turf Field" />
-                            </div>
-                            <div class="thumb-item">
-                                <img src="assets/images/pitch_indoor_arena_1791520804859.jpg" alt="Bench & Sideline" />
-                            </div>
-                            <div class="thumb-item">
-                                <img src="assets/images/pitch_stadium_11aside_1791520814735.jpg" alt="Floodlight View" />
-                            </div>
-                            <div class="thumb-item">
-                                <img src="assets/images/pitch_rooftop_urban_1791520826164.jpg" alt="Locker Facilities" />
-                            </div>
-                        </div>
-
-                        {/*<!-- Venue Title & Overview -->*/}
-                        <div class="section-block">
-                            <div class="pitch-header-row">
-                                <div>
-                                    <div class="pitch-tags-row">
-                                        <span class="badge-status badge-confirmed">Instant Confirmation</span>
-                                        <span class="pitch-format-tag">7-a-side</span>
-                                    </div>
-                                    <h1 class="font-display pitch-main-title">
-                                        Apex Cyber Stadium
-                                    </h1>
-                                    <div class="pitch-main-location">
-                                        45 Tran Nao Street, An Khanh Ward, District 2, Ho Chi Minh City
-                                    </div>
-                                </div>
-
-                                <div class="pitch-rating-col">
-                                    <div class="pitch-rating-val">
-                                        &#9733; 4.9 <span class="pitch-rating-count">(142 reviews)</span>
-                                    </div>
-                                    <div class="pitch-reviews-badge">
-                                        98% on-time pitch handover
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="pitch-description">
-                                Apex Cyber Stadium is a state-of-the-art 7-a-side football complex equipped with FIFA Quality Pro 4G artificial turf, anti-glare high-lumen floodlights, and dedicated spectator areas. Perfect for friendly weekend matches, inter-company tournaments, and evening training sessions.
-                            </div>
-                        </div>
-
-                        {/*<!-- Specifications & Facilities -->*/}
-                        <div class="section-block">
-                            <h2 class="section-block-title">Pitch Specifications</h2>
-                            <div class="specs-grid">
-                                <div class="spec-box">
-                                    <div class="spec-label">Format Size</div>
-                                    <div class="spec-val">7-a-side (50m x 30m)</div>
-                                </div>
-                                <div class="spec-box">
-                                    <div class="spec-label">Surface Material</div>
-                                    <div class="spec-val">4G Monofilament Turf + Rubber Infill</div>
-                                </div>
-                                <div class="spec-box">
-                                    <div class="spec-label">Lighting System</div>
-                                    <div class="spec-val">Phillips ArenaVision LED (500 Lux)</div>
-                                </div>
-                                <div class="spec-box">
-                                    <div class="spec-label">Goalpost Spec</div>
-                                    <div class="spec-val">Aluminum 5m x 2m Regulation</div>
-                                </div>
-                            </div>
-
-                            <h3 class="amenities-title">Amenities Included</h3>
-                            <div class="amenities-list">
-                                <span class="facility-chip">Free Motorbike Parking</span>
-                                <span class="facility-chip">Hot Water Showers</span>
-                                <span class="facility-chip">Locker Rooms</span>
-                                <span class="facility-chip">Beverage Bar (Pocari, Revive, Water)</span>
-                                <span class="facility-chip">Referee Booking Available</span>
-                                <span class="facility-chip">Free High-Speed Wi-Fi</span>
-                            </div>
-                        </div>
-
-                        {/*<!-- Interactive Time Slot Selector -->*/}
-                        <div class="section-block">
-                            <div class="schedule-header">
-                                <div>
-                                    <h2 class="section-block-title schedule-block-title">Available Schedule</h2>
-                                    <div class="schedule-subtitle">Choose date and click available slot to reserve</div>
-                                </div>
-                                <input type="date" value="2026-10-10" class="form-input schedule-date-input" />
-                            </div>
-
-                            {/*<!-- Morning Slots -->*/}
-                            <div class="slot-group">
-                                <div class="slot-group-title">Morning (Early Game)</div>
-                                <div class="slot-grid">
-                                    <div class="slot-item available">
-                                        <div class="slot-time">06:00 - 07:30</div>
-                                        <div class="slot-price">450.000 ₫</div>
-                                    </div>
-                                    <div class="slot-item booked">
-                                        <div class="slot-time">07:30 - 09:00</div>
-                                        <div class="slot-price">Booked</div>
-                                    </div>
-                                    <div class="slot-item available">
-                                        <div class="slot-time">09:00 - 10:30</div>
-                                        <div class="slot-price">450.000 ₫</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/*<!-- Afternoon Slots -->*/}
-                            <div class="slot-group">
-                                <div class="slot-group-title">Afternoon</div>
-                                <div class="slot-grid">
-                                    <div class="slot-item booked">
-                                        <div class="slot-time">15:00 - 16:30</div>
-                                        <div class="slot-price">Booked</div>
-                                    </div>
-                                    <div class="slot-item available">
-                                        <div class="slot-time">16:30 - 18:00</div>
-                                        <div class="slot-price">550.000 ₫</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/*<!-- Evening Prime Slots -->*/}
-                            <div class="slot-group">
-                                <div class="slot-group-title">Evening Prime Time (Floodlights Active)</div>
-                                <div class="slot-grid">
-                                    <div class="slot-item selected">
-                                        <div class="slot-time">18:00 - 19:30</div>
-                                        <div class="slot-price">650.000 ₫</div>
-                                    </div>
-                                    <div class="slot-item available">
-                                        <div class="slot-time">19:30 - 21:00</div>
-                                        <div class="slot-price">650.000 ₫</div>
-                                    </div>
-                                    <div class="slot-item available">
-                                        <div class="slot-time">21:00 - 22:30</div>
-                                        <div class="slot-price">550.000 ₫</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </main>
-
-                    {/*<!-- Sticky Booking Sidebar Summary -->*/}
-                    <aside class="booking-checkout-card">
-                        <div class="checkout-label">
-                            Selected Booking
-                        </div>
-                        <div class="checkout-venue-name">
-                            Apex Cyber Stadium
-                        </div>
-                        <div class="checkout-venue-location">
-                            Pitch #01 (7-a-side)
-                        </div>
-
-                        <div class="checkout-divider-block">
-                            <div class="checkout-summary-row">
-                                <span>Date:</span>
-                                <strong>Saturday, Oct 10, 2026</strong>
-                            </div>
-                            <div class="checkout-summary-row">
-                                <span>Time Slot:</span>
-                                <strong class="text-highlight-green">18:00 – 19:30 (90 mins)</strong>
-                            </div>
-                            <div class="checkout-summary-row-last">
-                                <span>Lighting:</span>
-                                <strong>LED Floodlights Included</strong>
-                            </div>
-                        </div>
-
-                        <div class="checkout-total-row">
-                            <div>
-                                <div class="checkout-total-label">Total Estimated Cost</div>
-                                <div class="checkout-total-amount">
-                                    650.000 ₫
-                                </div>
-                            </div>
-                            <div class="checkout-vat-badge">
-                                Pay at pitch or online
-                            </div>
-                        </div>
-
-                        <a href="user-dashboard.html" class="btn-primary checkout-submit-btn">
-                            CONFIRM BOOKING NOW
-                        </a>
-
-                        <div class="checkout-note">
-                            Free cancellation up to 6 hours before kickoff. No credit card required to hold reservation.
-                        </div>
-                    </aside>
-                </div>
-            </div>
-
-            {/*<!-- Footer -->*/}
-            <footer class="footer">
-                <div class="container">
-                    <div class="footer-bottom">
-                        <div>&copy; 2026 PitchBook Technologies Ltd. All rights reserved.</div>
-                        <div>
-                            <a href="#">Privacy Policy</a> · <a href="#">Terms</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-
-            {/*<!-- Floating Prototype Quick Switcher -->*/}
-            <nav class="prototype-switcher" aria-label="Prototype Navigation">
-                <span class="prototype-switcher-label">Views:</span>
-                <a href="index.html" class="prototype-switcher-btn">Home</a>
-                <a href="discovery.html" class="prototype-switcher-btn">Find Pitch</a>
-                <a href="pitch-details.html" class="prototype-switcher-btn active">Pitch Details</a>
-                <a href="signin.html" class="prototype-switcher-btn">Sign In</a>
-                <a href="signup.html" class="prototype-switcher-btn">Sign Up</a>
-                <a href="user-dashboard.html" class="prototype-switcher-btn">Player</a>
-                <a href="owner-dashboard.html" class="prototype-switcher-btn">Owner</a>
-                <a href="admin-dashboard.html" class="prototype-switcher-btn">Admin</a>
-            </nav>
-
+          <div className="pitch-top-meta">
+            <span>Venue ID: #{pitch.id || pitch._id}</span>
+            <span>·</span>
+            <span className="pitch-top-badge">{pitch.pitchType}</span>
+            <span>·</span>
+            <span className="pitch-top-badge">{pitch.status}</span>
+          </div>
         </div>
-    )
+      </div>
+
+      <div className="pitch-container">
+        {/* Pitch Title & Quick Stats Header */}
+        <div className="pitch-header-wrap">
+          <div>
+            <div className="pitch-type-tag-row">
+              <span className="pitch-type-chip">{pitch.pitchType}</span>
+              {/* <span className="pitch-surface-chip">
+                Surface: {pitch.surface}
+              </span> */}
+              {/* {pitch.dimensions && (
+                <>
+                  <span style={{ color: "#d1d5db" }}>·</span>
+                  <span className="pitch-dim-chip">{pitch.dimensions}</span>
+                </>
+              )} */}
+            </div>
+
+            <h1 className="pitch-main-heading">{pitch.name}</h1>
+
+            <div className="pitch-location-subrow">
+              <div className="pitch-loc-item">
+                <MapPin style={{ width: 14, height: 14, color: "#164BFF" }} />
+                <span>
+                  {pitch.address}
+                  {/* , {pitch.city} */}
+                </span>
+              </div>
+              <span>·</span>
+              <div className="pitch-rating-item">
+                <Star
+                  style={{
+                    width: 14,
+                    height: 14,
+                    fill: "#f59e0b",
+                    color: "#f59e0b",
+                  }}
+                />
+                <span>{pitch.rating?.toFixed ? pitch.rating.toFixed(1) : pitch.rating}</span>
+                {/* <span style={{ color: "#9ca3af", fontWeight: 400 }}>
+                  ({pitch.reviewCount} reviews)
+                </span> */}
+              </div>
+            </div>
+          </div>
+
+          <div className="pitch-rate-box">
+            <div className="pitch-rate-sub">Standard Rate</div>
+            <div className="pitch-rate-num">
+              {pitch.pricePerHour}
+              <span className="pitch-rate-per-hr"> /hr</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Pitch Photo Gallery */}
+        <div className="pitch-gallery-block">
+          <div className="pitch-hero-image-wrap">
+            <img
+              src={activeImage || pitch.imageUrl}
+              alt={pitch.name}
+              referrerPolicy="no-referrer"
+              className="pitch-hero-img"
+            />
+            {/* <div className="pitch-open-hours-badge">
+              <Clock
+                style={{
+                  width: 14,
+                  height: 14,
+                  color: "var(--color-neon-primary)",
+                }}
+              />
+              <span>
+                Open: {pitch.operatingHours.open} - {pitch.operatingHours.close}
+              </span>
+            </div> */}
+          </div>
+
+          {/* Thumbnails */}
+          {/* {pitch.gallery && pitch.gallery.length > 1 && (
+            <div className="pitch-thumbs-list">
+              {pitch.gallery.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImage(img)}
+                  className={`pitch-thumb-btn ${activeImage === img ? "active" : ""}`}
+                >
+                  <img
+                    src={img}
+                    alt=""
+                    referrerPolicy="no-referrer"
+                  />
+                </button>
+              ))}
+            </div>
+          )} */}
+        </div>
+
+        {/* Main Grid: Details + Interactive Slot Selector vs Booking Summary */}
+        <div className="pitch-layout-grid">
+          {/* Col 1 & 2: Pitch Info & Interactive Time-Slot Grid */}
+          <div className="pitch-info-col">
+            {/* Description & Facilities */}
+            <div className="pitch-panel-card">
+              <div>
+                <h3 className="pitch-panel-title">About this Football Field</h3>
+                <p className="pitch-desc-text">{pitch.description}</p>
+              </div>
+
+              {/* Facilities breakdown */}
+              <div
+                style={{ paddingTop: "1.5rem", borderTop: "1px solid #f3f4f6" }}
+              >
+                <h4
+                  className="pitch-period-label"
+                  style={{ marginBottom: "0.75rem" }}
+                >
+                  Available Facilities & Amenities
+                </h4>
+                <div className="pitch-facilities-grid">
+                  {pitch.facilities && pitch.facilities.map((facility, i) => (
+                    <div
+                      key={i}
+                      className="pitch-facility-pill"
+                    >
+                      <CheckCircle2
+                        style={{
+                          width: 16,
+                          height: 16,
+                          color: "#164BFF",
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span>{facility}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pitch Specifications */}
+              <div className="pitch-specs-grid">
+                {/* <div>
+                  <div className="pitch-spec-label">Turf Specification</div>
+                  <div className="pitch-spec-value">{pitch.surface}</div>
+                </div> */}
+                {/* <div>
+                  <div className="pitch-spec-label">Dimensions</div>
+                  <div className="pitch-spec-value">
+                    {pitch.dimensions || "Regulation"}
+                  </div>
+                </div> */}
+                {/* <div>
+                  <div className="pitch-spec-label">Managed By</div>
+                  <div className="pitch-spec-value">{pitch.ownerName}</div>
+                </div> */}
+                <div>
+                  <div className="pitch-spec-label">Managed By (Owner ID)</div>
+                  <div className="pitch-spec-value">
+                    {typeof pitch.ownerId === "object"
+                      ? pitch.ownerId?.name || pitch.ownerId?._id
+                      : pitch.ownerId}
+                  </div>
+                </div>
+                <div>
+                  <div className="pitch-spec-label">Status</div>
+                  <div className="pitch-spec-value">{pitch.status}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Interactive Time-Slot Selector Section */}
+            <div className="pitch-panel-card">
+              <div className="pitch-slots-header">
+                <div>
+                  <h3
+                    className="pitch-panel-title"
+                    style={{ margin: 0 }}
+                  >
+                    Select Date & Time Slots
+                  </h3>
+                  <p
+                    className="pitch-desc-text"
+                    style={{ fontSize: "0.75rem", marginTop: "0.25rem" }}
+                  >
+                    Click available 90-minute blocks to reserve. Multi-slot
+                    matches supported.
+                  </p>
+                </div>
+
+                {/* Match Date Picker */}
+                <div className="pitch-date-picker-group">
+                  <Calendar
+                    style={{ width: 16, height: 16, color: "#164BFF" }}
+                  />
+                  <input
+                    type="date"
+                    defaultValue={new Date().toISOString().split("T")[0]}
+                    min={new Date().toISOString().split("T")[0]}
+                    className="pitch-date-input"
+                  />
+                </div>
+              </div>
+
+              {/* Slot Legend */}
+              <div className="pitch-legend-strip">
+                <div className="pitch-legend-item">
+                  <div className="pitch-legend-dot-avail" />
+                  <span>Available</span>
+                </div>
+                <div className="pitch-legend-item">
+                  <div className="pitch-legend-dot-selected" />
+                  <span
+                    style={{ fontWeight: 600, color: "var(--bg-midnight)" }}
+                  >
+                    Selected
+                  </span>
+                </div>
+                <div className="pitch-legend-item">
+                  <div className="pitch-legend-dot-booked" />
+                  <span style={{ color: "#9ca3af" }}>Booked / Unavailable</span>
+                </div>
+              </div>
+
+              {/* Slots Grouped by Period */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1.5rem",
+                  paddingTop: "0.5rem",
+                }}
+              >
+                {/* Morning Slots */}
+                <div className="pitch-period-section">
+                  <div className="pitch-period-label">
+                    Morning Sessions (06:00 - 12:00)
+                  </div>
+                  <div className="pitch-slots-btn-grid">
+                    {sampleTimeSlots
+                      .filter((s) => s.period === "morning")
+                      .map((slot) => {
+                        const isSelected = selectedSlotIds.includes(slot.id);
+                        return (
+                          <button
+                            key={slot.id}
+                            type="button"
+                            disabled={slot.isBooked}
+                            onClick={() =>
+                              handleSlotToggle(slot.id, slot.isBooked)
+                            }
+                            className={`pitch-slot-button ${slot.isBooked ? "booked" : ""} ${isSelected ? "selected" : ""}`}
+                          >
+                            <div className="pitch-slot-time-text">
+                              {slot.time}
+                            </div>
+                            <div className="pitch-slot-price-text">
+                              {slot.isBooked ? "Booked" : slot.price}
+                            </div>
+                          </button>
+                        );
+                      })}
+                  </div>
+                </div>
+
+                {/* Afternoon Slots */}
+                <div className="pitch-period-section">
+                  <div className="pitch-period-label">
+                    Afternoon Sessions (12:00 - 17:00)
+                  </div>
+                  <div className="pitch-slots-btn-grid">
+                    {sampleTimeSlots
+                      .filter((s) => s.period === "afternoon")
+                      .map((slot) => {
+                        const isSelected = selectedSlotIds.includes(slot.id);
+                        return (
+                          <button
+                            key={slot.id}
+                            type="button"
+                            disabled={slot.isBooked}
+                            onClick={() =>
+                              handleSlotToggle(slot.id, slot.isBooked)
+                            }
+                            className={`pitch-slot-button ${slot.isBooked ? "booked" : ""} ${isSelected ? "selected" : ""}`}
+                          >
+                            <div className="pitch-slot-time-text">
+                              {slot.time}
+                            </div>
+                            <div className="pitch-slot-price-text">
+                              {slot.isBooked ? "Booked" : slot.price}
+                            </div>
+                          </button>
+                        );
+                      })}
+                  </div>
+                </div>
+
+                {/* Prime Evening Slots (Floodlights) */}
+                <div className="pitch-period-section">
+                  <div className="pitch-period-label pitch-period-label-prime">
+                    <span>
+                      Prime Evening & Floodlight Slots (17:00 - 23:00)
+                    </span>
+                    <span className="pitch-floodlight-badge">
+                      Floodlights On
+                    </span>
+                  </div>
+                  <div className="pitch-slots-btn-grid">
+                    {sampleTimeSlots
+                      .filter((s) => s.period === "evening")
+                      .map((slot) => {
+                        const isSelected = selectedSlotIds.includes(slot.id);
+                        return (
+                          <button
+                            key={slot.id}
+                            type="button"
+                            disabled={slot.isBooked}
+                            onClick={() =>
+                              handleSlotToggle(slot.id, slot.isBooked)
+                            }
+                            className={`pitch-slot-button ${slot.isBooked ? "booked" : ""} ${isSelected ? "selected" : ""}`}
+                          >
+                            <div className="pitch-slot-time-text">
+                              {slot.time}
+                            </div>
+                            <div className="pitch-slot-price-text">
+                              {slot.isBooked ? "Booked" : slot.price}
+                            </div>
+                          </button>
+                        );
+                      })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Col 3: Sticky Booking Summary & Contact Panel */}
+          <div>
+            <div className="pitch-summary-card">
+              <div className="pitch-summary-header">
+                <div className="pitch-summary-kicker">Booking Details</div>
+                <h3 className="pitch-summary-title">Match Summary</h3>
+              </div>
+
+              {/* Breakdown stats */}
+              <div className="pitch-summary-list">
+                <div className="pitch-summary-row">
+                  <span className="pitch-summary-row-label">Pitch Format:</span>
+                  <span className="pitch-summary-row-val">
+                    {pitch.pitchType}
+                  </span>
+                </div>
+                <div className="pitch-summary-row">
+                  <span className="pitch-summary-row-label">
+                    Selected Slots:
+                  </span>
+                  <span className="pitch-summary-row-val">
+                    {selectedSlotIds.length} slot(s)
+                  </span>
+                </div>
+                <div className="pitch-selected-slot-item">17:00 - 18:30</div>
+              </div>
+
+              {/* Player Contact Form */}
+              <div className="pitch-form-group">
+                <label className="pitch-form-label">
+                  Match Organizer Details
+                </label>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  defaultValue={currentUser?.name || "Khoi Hoang"}
+                  className="pitch-form-input"
+                />
+                <input
+                  type="tel"
+                  placeholder="Phone (e.g. +84 908 123 456)"
+                  defaultValue={currentUser?.phone || "+84 908 123 456"}
+                  className="pitch-form-input"
+                />
+              </div>
+
+              {/* Payment Method Selector */}
+              <div className="pitch-form-group">
+                <label className="pitch-form-label">Payment Method</label>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.375rem",
+                  }}
+                >
+                  {[
+                    { id: "vnpay", label: "VNPay / Banking QR (Instant)" },
+                    { id: "venue", label: "Pay at Venue upon Arrival" },
+                    { id: "momo", label: "MoMo E-Wallet" },
+                  ].map((method, idx) => (
+                    <label
+                      key={method.id}
+                      className="pitch-payment-item"
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        defaultChecked={idx === 0}
+                      />
+                      <span>{method.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Total Price Section */}
+              <div className="pitch-total-block">
+                <div className="pitch-total-row">
+                  <span className="pitch-total-label">Total Amount</span>
+                  <span className="pitch-total-amount">{totalPrice}</span>
+                </div>
+                <div className="pitch-total-sub">
+                  Includes pitch reservation, equipment and floodlight costs
+                </div>
+              </div>
+
+              {/* Book Action Button */}
+              <button
+                type="button"
+                onClick={handleConfirmBooking}
+                className="pitch-confirm-btn active"
+              >
+                Confirm & Reserve Pitch
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Booking Confirmation Dialog Modal */}
+      {showModal && (
+        <div className="pitch-modal-backdrop">
+          <div className="pitch-modal-card">
+            <div className="pitch-modal-icon-wrap">
+              <CheckCircle2 style={{ width: 32, height: 32 }} />
+            </div>
+
+            <div className="pitch-modal-center-header">
+              <span className="pitch-modal-kicker">Match Reserved</span>
+              <h3 className="pitch-modal-heading">Booking Confirmed!</h3>
+              <p className="pitch-modal-code-text">
+                Confirmation code:{" "}
+                <strong className="pitch-modal-code-val">#BK-9201</strong>
+              </p>
+            </div>
+
+            <div className="pitch-modal-recap-box">
+              <div className="pitch-modal-recap-row">
+                <span>Venue:</span>
+                <strong>{pitch.name}</strong>
+              </div>
+              <div className="pitch-modal-recap-row">
+                <span>Total Amount:</span>
+                <strong
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    color: "var(--color-neon-primary)",
+                  }}
+                >
+                  {totalPrice}
+                </strong>
+              </div>
+            </div>
+
+            <div className="pitch-modal-btn-grid">
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  navigate("/dashboard");
+                }}
+                className="pitch-modal-btn-primary"
+              >
+                View in Dashboard
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="pitch-modal-btn-secondary"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }

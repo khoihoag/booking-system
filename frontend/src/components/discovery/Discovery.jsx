@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useApp } from "../../context/AppContext";
+import { Link } from "react-router-dom";
 import {
   Search,
   MapPin,
@@ -11,7 +12,7 @@ import {
 } from "lucide-react";
 import "./Discovery.css";
 import { initialPitches } from "../../data/Pitches";
-import axios from 'axios'
+import axios from "axios";
 
 const allFacilities = [
   "LED Floodlights",
@@ -31,19 +32,20 @@ const allFacilities = [
 - Cấu hình giao diện thuần túy (không gồm logic).
  */
 export default function () {
-  const { viewPitchDetails } = useApp();
   const displayedPitches = initialPitches;
-  const  [pitches, setPitches] = useState([])
+  const [pitches, setPitches] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    axios.get("/api/pitch").then((res) => {
-      const pitchesRes = res.data;
-      setPitches(pitchesRes.data)
-    }).catch(err => setErrorMsg(err.response?.data?.message))
-  }, [])
-  console.log(pitches)
-
+    axios
+      .get("/api/pitch")
+      .then((res) => {
+        const pitchesRes = res.data;
+        setPitches(pitchesRes.data);
+      })
+      .catch((err) => setErrorMsg(err.response?.data?.message));
+  }, []);
+  console.log(pitches);
 
   return (
     <div className="discovery-page">
@@ -131,9 +133,7 @@ export default function () {
                   >
                     Max Price
                   </label>
-                  <span className="discovery-price-current">
-                    {(1500000)}/hr
-                  </span>
+                  <span className="discovery-price-current">{1500000}/hr</span>
                 </div>
                 <input
                   type="range"
@@ -271,14 +271,14 @@ export default function () {
                           <span className="discovery-rate-unit"> /hr</span>
                         </div>
                       </div>
-
-                      <button
-                        onClick={() => viewPitchDetails(pitch)}
-                        className="discovery-select-slot-btn"
-                      >
-                        <span>Select Slots</span>
-                        <ArrowUpRight style={{ width: 14, height: 14 }} />
-                      </button>
+                      <Link to={`/pitch-detail/${pitch.id}`}>
+                        <button
+                          className="discovery-select-slot-btn"
+                        >
+                          <span>Select Slots</span>
+                          <ArrowUpRight style={{ width: 14, height: 14 }} />
+                        </button>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -328,7 +328,7 @@ export default function () {
                 className="discovery-price-current"
                 style={{ marginBottom: "0.5rem" }}
               >
-                {(1500000)}/hr
+                {1500000}/hr
               </div>
               <input
                 type="range"
