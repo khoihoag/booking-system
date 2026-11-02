@@ -29,7 +29,6 @@ exports.signup = catchAsync(async (req, res, next) => {
 exports.login = catchAsync(async (req, res, next) => {
     const { email, password } = req.body
     const { user, token } = await authServices.login(email, password)
-    console.log(email + " " + password)
     createSendToken(user, 200, token, res)
 })
 
@@ -79,7 +78,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 // Cập nhật mật khẩu khi đã đăng nhập
 exports.updatePassword = catchAsync(async (req, res, next) => {
     const { user, token } = await authServices.updatePassword(
-        req.user.id,
+        req.user._id || req.user.id,
         req.body.passwordCurrent,
         req.body.password,
         req.body.password_confirm

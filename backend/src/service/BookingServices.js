@@ -68,15 +68,16 @@ exports.cancelBooking = async (id, user) => {
         return null
     }
 
-    const bookingUserId = booking.userId._id ? booking.userId._id.toString() : booking.userId.toString()
-    const isOwner = bookingUserId === user.id.toString()
+    const bookingUserId = booking.userId?._id ? booking.userId._id.toString() : booking.userId?.toString()
+    const currentUserId = (user?._id || user?.id || user)?.toString()
+    const isOwner = bookingUserId && currentUserId && bookingUserId === currentUserId
 
-    if (!isOwner && user.role !== 'admin' && user.role !== 'pitch_owner') {
+    if (!isOwner && user?.role !== 'admin' && user?.role !== 'pitch_owner') {
         throw new AppError('You do not have permission to cancel this booking', 403)
     }
 
     if (booking.status !== 'cancelled') {
-        const slotId = booking.timeSlotId._id || booking.timeSlotId
+        const slotId = booking.timeSlotId?._id || booking.timeSlotId
         if (slotId) {
             await timeSlotRepository.update(slotId, { status: 'available' })
         }

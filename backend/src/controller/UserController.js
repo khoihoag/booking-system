@@ -21,7 +21,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 })
 
 exports.getUserById = catchAsync(async (req, res, next) => {
-    const user = await userServices.findUserById(req.params.id)
+    const user = await userServices.findUserById(req.params._id)
 
     if (!user) {
         return next(new AppError('No user found with that ID', 404))
@@ -34,7 +34,7 @@ exports.getUserById = catchAsync(async (req, res, next) => {
 })
 
 exports.updateUser = catchAsync(async (req, res, next) => {
-    const user = await userServices.updateUser(req.params.id, req.body)
+    const user = await userServices.updateUser(req.params._id, req.body)
 
     if (!user) {
         return next(new AppError('No user found with that ID', 404))
@@ -47,7 +47,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 })
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
-    const user = await userServices.deleteUser(req.params.id)
+    const user = await userServices.deleteUser(req.params._id)
 
     if (!user) {
         return next(new AppError('No user found with that ID', 404))
@@ -60,7 +60,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
 // ME
 exports.updateData = catchAsync(async (req, res, next) => {
-    const updatedUser = await userServices.updateData(req.user.id, req.body)
+    const updatedUser = await userServices.updateData(req.user._id, req.body)
 
     if (!updatedUser) {
         return next(new AppError('No user found with that ID', 404))
@@ -75,7 +75,7 @@ exports.updateData = catchAsync(async (req, res, next) => {
 })
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
-    const deleteMe = await userServices.deleteUser(req.user.id)
+    const deleteMe = await userServices.deleteUser(req.user._id)
 
     if (!deleteMe) {
         return next(new AppError('No user found with that ID', 404))
@@ -84,7 +84,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 })
 
 exports.getMe = catchAsync(async (req, res, next) => {
-    const me = await userServices.findUserById(req.user.id)
+    const me = await userServices.findUserById(req.user._id)
 
     if (!me) {
         return next(new AppError('No user found with that ID', 404))

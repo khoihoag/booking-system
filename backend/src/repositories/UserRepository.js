@@ -31,7 +31,7 @@ exports.findByResetToken = async (hashedToken) => {
 
 exports.update = async (id, data) => {
     return await User.findByIdAndUpdate(id, data, {
-        new: true,
+        returnDocument: 'after',
         runValidators: true
     })
 }
@@ -41,5 +41,5 @@ exports.saveUser = async (user, options = {}) => {
 }
 
 exports.delete = async (id) => {
-    return await User.findByIdAndDelete(id, {active: false}, {new: true})
+    return await User.findByIdAndDelete(id)
 }

@@ -10,7 +10,7 @@ const app = express()
 const fieldRouter = require('./routes/PitchRouter')
 const timeSlotRouter = require('./routes/TimeSlotRouter')
 const userRouter = require('./routes/UserRouter')
-const bookingRouter = require('./routes/BookingRoute')
+const bookingRouter = require('./routes/BookingRouter')
 const globalErrorlHandler = require('./controller/ErrorController')
 const AppError = require('./utils/AppError')
 

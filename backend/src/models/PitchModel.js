@@ -9,11 +9,11 @@ const pitchSchema = new mongoose.Schema(
 
             required: true
         },
-        timeSlots: {
-            type: Schema.Types.ObjectId,
-            ref: 'time_slots',
-            required: true
-        },
+        // timeSlots: {
+        //     type: Schema.Types.ObjectId,
+        //     ref: 'time_slots',
+        //     required: true
+        // },
         imageUrl: {
             type: String,
             default: ''
@@ -60,7 +60,13 @@ const pitchSchema = new mongoose.Schema(
             }
         }
     },{
-        id: false 
+        id: false,
+        toJSON: {
+        virtuals: true
+        },
+        toObject: {
+            virtuals: true
+        }
     }
     // {
     //     toJSON: {
@@ -119,7 +125,7 @@ pitchSchema.virtual('pitch_type')
 // })
 
 pitchSchema.virtual('time_slots', {
-    ref: "TimeSlot",
+    ref: "time_slots",
     localField: "_id",
     foreignField: "pitchId"
 })

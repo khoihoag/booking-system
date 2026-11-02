@@ -33,7 +33,6 @@ exports.login = async (email, password) => {
     const user = await userRepository.findByEmail(email, true)
     
     if (!user || !(await user.correctPassword(password, user.password))) {
-        console.log(1)
         throw new AppError('Incorrect email or password', 401)
     }
 

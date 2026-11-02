@@ -14,7 +14,7 @@ exports.findOne = async (filter) => {
         path: 'ownerId',
         select: 'name email -_id'
     }).populate({
-        path: 'timeSlots'
+        path: 'time_slots'
     })
 }
 
@@ -22,6 +22,8 @@ exports.findByFilter = async (filter = {}) => {
     return await Pitch.find(filter).populate({
         path: 'ownerId',
         select: ['name', 'email', '-_id']
+    }).populate({
+        path: 'time_slots'
     })
 }
 

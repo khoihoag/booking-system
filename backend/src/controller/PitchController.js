@@ -16,7 +16,7 @@ exports.createPitch = catchAsync(async (req, res) => {
 })
 
 exports.getPitchesByUser = catchAsync(async (req, res, next) => {
-    const ownerId = req.user.id
+    const ownerId = req.user._id || req.user.id
     const pitches = await pitchServices.findByOwner(ownerId)
 
     if (!pitches) {

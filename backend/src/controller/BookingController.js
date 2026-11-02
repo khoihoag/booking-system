@@ -4,7 +4,7 @@ const AppError = require('../utils/AppError')
 
 exports.createBooking = catchAsync(async (req, res, next) => {
     const bookingData = {
-        userId: req.user.id,
+        userId: req.user._id,
         timeSlotId: req.body.timeSlotId,
         totalPrice: req.body.totalPrice
     }
@@ -28,7 +28,7 @@ exports.getAllBookings = catchAsync(async (req, res, next) => {
 })
 
 exports.getMyBookings = catchAsync(async (req, res, next) => {
-    const bookings = await bookingServices.getMyBookings(req.user.id)
+    const bookings = await bookingServices.getMyBookings(req.user._id)
 
     res.status(200).json({
         status: 'success',
@@ -38,14 +38,16 @@ exports.getMyBookings = catchAsync(async (req, res, next) => {
 })
 
 exports.getBookingById = catchAsync(async (req, res, next) => {
-    const booking = await bookingServices.findBookingById(req.params.id)
+    const bookingId = req.params.id || req.params._id
+    const booking = await bookingServices.findBookingById(bookingId)
 
     if (!booking) {
         return next(new AppError('No booking found with that ID', 404))
     }
 
-    const bookingUserId = booking.userId._id ? booking.userId._id.toString() : booking.userId.toString()
-    const isOwner = bookingUserId === req.user.id.toString()
+    const bookingUserId = booking.userId?._id ? booking.userId._id.toString() : booking.userId?.toString()
+    const currentUserId = (req.user._id || req.user.id)?.toString()
+    const isOwner = bookingUserId && currentUserId && bookingUserId === currentUserId
 
     if (!isOwner && req.user.role !== 'admin' && req.user.role !== 'pitch_owner') {
         return next(new AppError('You do not have permission to access this booking', 403))
@@ -58,7 +60,8 @@ exports.getBookingById = catchAsync(async (req, res, next) => {
 })
 
 exports.updateBooking = catchAsync(async (req, res, next) => {
-    const booking = await bookingServices.updateBooking(req.params.id, req.body)
+    const bookingId = req.params.id || req.params._id
+    const booking = await bookingServices.updateBooking(bookingId, req.body)
 
     if (!booking) {
         return next(new AppError('No booking found with that ID', 404))
@@ -71,7 +74,8 @@ exports.updateBooking = catchAsync(async (req, res, next) => {
 })
 
 exports.cancelBooking = catchAsync(async (req, res, next) => {
-    const booking = await bookingServices.cancelBooking(req.params.id, req.user)
+    const bookingId = req.params.id || req.params._id
+    const booking = await bookingServices.cancelBooking(bookingId, req.user)
 
     if (!booking) {
         return next(new AppError('No booking found with that ID', 404))
