@@ -20,7 +20,7 @@ export default function () {
   const [activeImage, setActiveImage] = useState();
   const [selectedSlotIds, setSelectedSlotIds] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const sampleTimeSlots = [];
+  const [timeSlots, setTimeSlots] = useState([]);
 
   useEffect(() => {
     axios
@@ -29,9 +29,10 @@ export default function () {
         const pitchRes = res.data;
         setPitch(pitchRes.data);
         setActiveImage(pitchRes.data?.imageUrl);
+        setTimeSlots(pitchRes.data.time_slots);
       })
       .catch((err) => {
-        console.log(err.response?.data?.message);
+        console.log(err);
       });
   }, [id]);
 
@@ -40,17 +41,96 @@ export default function () {
     setSelectedSlotIds((prev) =>
       prev.includes(slotId)
         ? prev.filter((item) => item !== slotId)
-        : [...prev, slotId]
+        : [...prev, slotId],
     );
   };
+
+  // Tính tổng tiền của các timeSlot đã chọn
+  const totalPrice = timeSlots
+    .filter((slot) => selectedSlotIds.includes(slot._id))
+    .reduce((sum, slot) => sum + slot.price, 0);
+
+  // Chia ca timeSlots
+  const getShiftFromTime = (timeStr) => {
+    if (!timeStr || typeof timeStr !== "string") return "Không xác định";
+
+    // Lấy ra phần giờ bắt đầu (ví dụ: "06:00 - 08:00" -> lấy "06:00")
+    const startTime = timeStr.split("-")[0].trim();
+
+    // Lấy số giờ (phần nguyên trước dấu hai chấm)
+    const startHour = parseInt(startTime.split(":")[0], 10);
+
+    // Quy chuẩn phân ca:
+    // - Ca sáng: Từ 05:00 đến trước 12:00
+    // - Ca chiều: Từ 12:00 đến trước 17:00
+    // - Ca tối: Từ 17:00 trở đi (hoặc trước 05:00 sáng hôm sau)
+    if (startHour >= 5 && startHour < 12) {
+      return "Morning";
+    } else if (startHour >= 12 && startHour < 17) {
+      return "Afternoon";
+    } else {
+      return "Evening";
+    }
+  };
+
+  // Lấy khoảng thời gian của các timeSlot đã chọn
+  const getSelectedTimeRangeString = () => {
+    if (selectedSlotIds.length === 0) return "Chưa chọn ca nào";
+
+    // Lọc ra các slot đang được chọn
+    const selectedSlots = timeSlots.filter((slot) =>
+      selectedSlotIds.includes(slot._id),
+    );
+    if (selectedSlots.length === 0) return "Chưa chọn ca nào";
+
+    // Hàm chuyển giờ sang phút để sắp xếp
+    const timeToMinutes = (timeStr) => {
+      const [hours, minutes] = timeStr.split(":").map(Number);
+      return hours * 60 + minutes;
+    };
+
+    // Tách startTime, endTime và sắp xếp từ sớm -> muộn
+    const parsedSlots = selectedSlots
+      .map((slot) => {
+        const [start, end] = slot.time.split("-").map((s) => s.trim());
+        return {
+          startStr: start,
+          endStr: end,
+          startMin: timeToMinutes(start),
+          endMin: timeToMinutes(end),
+        };
+      })
+      .sort((a, b) => a.startMin - b.startMin);
+
+    // Gộp các ca liền kề hoặc chồng chéo
+    const mergedRanges = [];
+    let currentRange = { ...parsedSlots[0] };
+
+    for (let i = 1; i < parsedSlots.length; i++) {
+      const nextSlot = parsedSlots[i];
+
+      if (currentRange.endMin >= nextSlot.startMin) {
+        if (nextSlot.endMin > currentRange.endMin) {
+          currentRange.endStr = nextSlot.endStr;
+          currentRange.endMin = nextSlot.endMin;
+        }
+      } else {
+        mergedRanges.push(`${currentRange.startStr} - ${currentRange.endStr}`);
+        currentRange = { ...nextSlot };
+      }
+    }
+    mergedRanges.push(`${currentRange.startStr} - ${currentRange.endStr}`);
+
+    return mergedRanges.join(", ");
+  };
+
+  // Gọi hàm để lấy chuỗi khoảng thời gian hiện tại
+  const selectedTimeRange = getSelectedTimeRangeString();
 
   const handleConfirmBooking = () => {
     setShowModal(true);
   };
 
-  const totalPrice = selectedSlotIds.length * (pitch?.pricePerHour || 0);
-
-  console.log(pitch);
   if (!pitch) {
     return <div className="loading">Đang tải thông tin sân bóng...</div>;
   }
@@ -81,6 +161,7 @@ export default function () {
         {/* Pitch Title & Quick Stats Header */}
         <div className="pitch-header-wrap">
           <div>
+            21
             <div className="pitch-type-tag-row">
               <span className="pitch-type-chip">{pitch.pitchType}</span>
               {/* <span className="pitch-surface-chip">
@@ -93,9 +174,7 @@ export default function () {
                 </>
               )} */}
             </div>
-
             <h1 className="pitch-main-heading">{pitch.name}</h1>
-
             <div className="pitch-location-subrow">
               <div className="pitch-loc-item">
                 <MapPin style={{ width: 14, height: 14, color: "#164BFF" }} />
@@ -114,7 +193,11 @@ export default function () {
                     color: "#f59e0b",
                   }}
                 />
-                <span>{pitch.rating?.toFixed ? pitch.rating.toFixed(1) : pitch.rating}</span>
+                <span>
+                  {pitch.rating?.toFixed
+                    ? pitch.rating.toFixed(1)
+                    : pitch.rating}
+                </span>
                 {/* <span style={{ color: "#9ca3af", fontWeight: 400 }}>
                   ({pitch.reviewCount} reviews)
                 </span> */}
@@ -196,22 +279,23 @@ export default function () {
                   Available Facilities & Amenities
                 </h4>
                 <div className="pitch-facilities-grid">
-                  {pitch.facilities && pitch.facilities.map((facility, i) => (
-                    <div
-                      key={i}
-                      className="pitch-facility-pill"
-                    >
-                      <CheckCircle2
-                        style={{
-                          width: 16,
-                          height: 16,
-                          color: "#164BFF",
-                          flexShrink: 0,
-                        }}
-                      />
-                      <span>{facility}</span>
-                    </div>
-                  ))}
+                  {pitch.facilities &&
+                    pitch.facilities.map((facility, i) => (
+                      <div
+                        key={i}
+                        className="pitch-facility-pill"
+                      >
+                        <CheckCircle2
+                          style={{
+                            width: 16,
+                            height: 16,
+                            color: "#164BFF",
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span>{facility}</span>
+                      </div>
+                    ))}
                 </div>
               </div>
 
@@ -314,18 +398,19 @@ export default function () {
                     Morning Sessions (06:00 - 12:00)
                   </div>
                   <div className="pitch-slots-btn-grid">
-                    {sampleTimeSlots
-                      .filter((s) => s.period === "morning")
+                    {console.log(1)}
+                    {timeSlots
+                      .filter((s) => getShiftFromTime(s.time) === "Morning")
                       .map((slot) => {
-                        const isSelected = selectedSlotIds.includes(slot.id);
+                        const isSelected = selectedSlotIds.includes(slot._id);
                         return (
                           <button
-                            key={slot.id}
+                            key={slot._id}
                             type="button"
                             disabled={slot.isBooked}
-                            onClick={() =>
-                              handleSlotToggle(slot.id, slot.isBooked)
-                            }
+                            onClick={() => {
+                              handleSlotToggle(slot._id, slot.isBooked);
+                            }}
                             className={`pitch-slot-button ${slot.isBooked ? "booked" : ""} ${isSelected ? "selected" : ""}`}
                           >
                             <div className="pitch-slot-time-text">
@@ -346,18 +431,18 @@ export default function () {
                     Afternoon Sessions (12:00 - 17:00)
                   </div>
                   <div className="pitch-slots-btn-grid">
-                    {sampleTimeSlots
-                      .filter((s) => s.period === "afternoon")
+                    {timeSlots
+                      .filter((s) => getShiftFromTime(s.time) === "Afternoon")
                       .map((slot) => {
-                        const isSelected = selectedSlotIds.includes(slot.id);
+                        const isSelected = selectedSlotIds.includes(slot._id);
                         return (
                           <button
-                            key={slot.id}
+                            key={slot._id}
                             type="button"
                             disabled={slot.isBooked}
-                            onClick={() =>
-                              handleSlotToggle(slot.id, slot.isBooked)
-                            }
+                            onClick={() => {
+                              handleSlotToggle(slot._id, slot.isBooked);
+                            }}
                             className={`pitch-slot-button ${slot.isBooked ? "booked" : ""} ${isSelected ? "selected" : ""}`}
                           >
                             <div className="pitch-slot-time-text">
@@ -383,18 +468,19 @@ export default function () {
                     </span>
                   </div>
                   <div className="pitch-slots-btn-grid">
-                    {sampleTimeSlots
-                      .filter((s) => s.period === "evening")
+                    {timeSlots
+                      .filter((s) => getShiftFromTime(s.time) === "Evening")
                       .map((slot) => {
-                        const isSelected = selectedSlotIds.includes(slot.id);
+                        const isSelected = selectedSlotIds.includes(slot._id);
                         return (
                           <button
-                            key={slot.id}
+                            key={slot._id}
                             type="button"
                             disabled={slot.isBooked}
-                            onClick={() =>
-                              handleSlotToggle(slot.id, slot.isBooked)
-                            }
+                            onClick={() => {
+                              handleSlotToggle(slot._id, slot.isBooked);
+                              console.log(totalPrice);
+                            }}
                             className={`pitch-slot-button ${slot.isBooked ? "booked" : ""} ${isSelected ? "selected" : ""}`}
                           >
                             <div className="pitch-slot-time-text">
@@ -436,7 +522,9 @@ export default function () {
                     {selectedSlotIds.length} slot(s)
                   </span>
                 </div>
-                <div className="pitch-selected-slot-item">17:00 - 18:30</div>
+                <div className="pitch-selected-slot-item">
+                  {selectedTimeRange}
+                </div>
               </div>
 
               {/* Player Contact Form */}

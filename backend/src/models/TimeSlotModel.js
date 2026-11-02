@@ -9,18 +9,14 @@ const timeSlotSchema = new mongoose.Schema(
             ref: 'pitches',
             required: [true, 'a time slot must belong to a pitch']
         },
-        start_time: {
-            type: Date,
-            required: [true, 'a time slot must have a start time']
+        time: {
+            type: String,
+            required: [true, 'a time slot must have a time ']
         },
-        end_time: {
-            type: Date,
-            required: [true, 'a time slot must have an end time']
-        },
-        date: {
-            type: Date,
-            required: [true, 'a time slot must have a date']
-        },
+        // date: {
+        //     type: Date,
+        //     required: [true, 'a time slot must have a date']
+        // },
         status: {
             type: String,
             default: 'available',
@@ -35,6 +31,10 @@ const timeSlotSchema = new mongoose.Schema(
             min: [0, 'price must be greater than or equal to 0']
         },
         is_peak_hour: {
+            type: Boolean,
+            default: false
+        },
+        isBooked: {
             type: Boolean,
             default: false
         }

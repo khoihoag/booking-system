@@ -47,6 +47,32 @@ export default function () {
   }, []);
   console.log(pitches);
 
+
+  const getPriceRangeString = (timeSlots) => {
+  // Kiểm tra nếu mảng trống hoặc không hợp lệ
+  if (!timeSlots || timeSlots.length === 0) {
+    return "0đ";
+  }
+
+  // Lấy ra một mảng chỉ gồm các con số giá tiền
+  const prices = timeSlots.map((slot) => slot.price);
+
+  // Tìm giá nhỏ nhất và lớn nhất
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+
+  // Nếu giá min và max bằng nhau thì chỉ trả về 1 mức giá
+  if (minPrice === maxPrice) {
+    return `${minPrice}`;
+  }
+
+  // // Định dạng lại số theo chuẩn tiền tệ Việt Nam (có dấu chấm phân cách hàng nghìn)
+  // const formattedMin = minPrice.toLocaleString('vi-VN');
+  // const formattedMax = maxPrice.toLocaleString('vi-VN');
+
+  return `${minPrice} - ${maxPrice}`;
+}
+
   return (
     <div className="discovery-page">
       {/* Top Banner / Breadcrumb & Title */}
@@ -206,9 +232,10 @@ export default function () {
 
             {/* Populated Pitches Grid */}
             <div className="discovery-cards-grid">
+              {console.log(pitches)}
               {pitches.map((pitch) => (
                 <div
-                  key={pitch.id}
+                  key={pitch._id}
                   className="discovery-pitch-card"
                 >
                   {/* Pitch Photo */}
@@ -267,11 +294,11 @@ export default function () {
                       <div>
                         <div className="discovery-rate-label">Hourly Rate</div>
                         <div className="discovery-rate-value">
-                          {pitch.pricePerHour}
+                          {getPriceRangeString(pitch.time_slots)}
                           <span className="discovery-rate-unit"> /hr</span>
                         </div>
                       </div>
-                      <Link to={`/pitch-detail/${pitch.id}`}>
+                      <Link to={`/pitch-detail/${pitch._id}`}>
                         <button
                           className="discovery-select-slot-btn"
                         >
