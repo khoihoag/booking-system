@@ -6,21 +6,44 @@ import {
   MapPin,
   Star,
   Calendar,
-  Clock,
   CheckCircle2,
   ChevronLeft,
+  RefreshCw,
+  X,
+  Copy,
+  Check,
+  ArrowRight,
+  User,
+  Sparkles,
 } from "lucide-react";
 import axios from "axios";
+import { MockVietQRCard } from "./MockVietQRCard";
 
-export default function () {
+export default function PitchDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useApp() || {};
   const [pitch, setPitch] = useState(undefined);
   const [activeImage, setActiveImage] = useState();
   const [selectedSlotIds, setSelectedSlotIds] = useState([]);
-  const [showModal, setShowModal] = useState(false);
   const [timeSlots, setTimeSlots] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(() => {
+    return new Date().toISOString().split("T")[0];
+  });
+  // Quản lý Modal đặt sân & quy trình thanh toán
+  const [showModal, setShowModal] = useState(false);
+  const [modalStep, setModalStep] = useState("summary_qr");
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [bookingCode, setBookingCode] = useState("BK-9201");
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [organizerName, setOrganizerName] = useState(
+    currentUser?.name || "Khoi Hoang",
+  );
+  const [organizerPhone, setOrganizerPhone] = useState(
+    currentUser?.phone || "+84 908 123 456",
+  );
+  const organizerNote = "";
+  const [paymentMethod, setPaymentMethod] = useState("vnpay");
 
   useEffect(() => {
     axios
@@ -49,6 +72,10 @@ export default function () {
   const totalPrice = timeSlots
     .filter((slot) => selectedSlotIds.includes(slot._id))
     .reduce((sum, slot) => sum + slot.price, 0);
+
+  const selectedSlots = timeSlots.filter((slot) =>
+    selectedSlotIds.includes(slot._id),
+  );
 
   // Chia ca timeSlots
   const getShiftFromTime = (timeStr) => {
@@ -127,8 +154,37 @@ export default function () {
   // Gọi hàm để lấy chuỗi khoảng thời gian hiện tại
   const selectedTimeRange = getSelectedTimeRangeString();
 
+  // Mở popup xác nhận đơn đặt & quét mã QR
   const handleConfirmBooking = () => {
+    if (selectedSlotIds.length === 0) {
+      // addToast(
+      //   "warning",
+      //   "Chưa chọn khung giờ",
+      //   "Vui lòng chọn ít nhất 1 khung giờ thi đấu để đặt sân.",
+      // );
+      return;
+    }
+    // Sinh mã đơn đặt sân ngẫu nhiên thực tế
+    const newBookingCode = "BK-" + Math.floor(100000 + Math.random() * 900000);
+    setBookingCode(newBookingCode);
+    setModalStep("summary_qr");
+    setIsProcessingPayment(false);
     setShowModal(true);
+  };
+
+  // Nút tạm thời: Xác nhận thanh toán (Mô phỏng quy trình thanh toán thành công)
+  const handleSimulatePayment = () => {
+    setIsProcessingPayment(true);
+    setTimeout(() => {
+      setIsProcessingPayment(false);
+      setModalStep("success"); // Chuyển sang bước thông báo thành công
+    }, 650);
+  };
+
+  const handleCopyBookingCode = () => {
+    navigator.clipboard.writeText(bookingCode);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
   if (!pitch) {
@@ -356,7 +412,8 @@ export default function () {
                   />
                   <input
                     type="date"
-                    defaultValue={new Date().toISOString().split("T")[0]}
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
                     min={new Date().toISOString().split("T")[0]}
                     className="pitch-date-input"
                   />
@@ -535,13 +592,15 @@ export default function () {
                 <input
                   type="text"
                   placeholder="Full Name"
-                  defaultValue={currentUser?.name || "Khoi Hoang"}
+                  value={organizerName}
+                  onChange={(e) => setOrganizerName(e.target.value)}
                   className="pitch-form-input"
                 />
                 <input
                   type="tel"
                   placeholder="Phone (e.g. +84 908 123 456)"
-                  defaultValue={currentUser?.phone || "+84 908 123 456"}
+                  value={organizerPhone}
+                  onChange={(e) => setOrganizerPhone(e.target.value)}
                   className="pitch-form-input"
                 />
               </div>
@@ -560,7 +619,7 @@ export default function () {
                     { id: "vnpay", label: "VNPay / Banking QR (Instant)" },
                     { id: "venue", label: "Pay at Venue upon Arrival" },
                     { id: "momo", label: "MoMo E-Wallet" },
-                  ].map((method, idx) => (
+                  ].map((method) => (
                     <label
                       key={method.id}
                       className="pitch-payment-item"
@@ -568,7 +627,9 @@ export default function () {
                       <input
                         type="radio"
                         name="paymentMethod"
-                        defaultChecked={idx === 0}
+                        value={method.id}
+                        checked={paymentMethod === method.id}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
                       />
                       <span>{method.label}</span>
                     </label>
@@ -600,59 +661,399 @@ export default function () {
         </div>
       </div>
 
-      {/* Booking Confirmation Dialog Modal */}
+      {/* Booking Confirmation & Multi-Step Payment Modal */}
       {showModal && (
-        <div className="pitch-modal-backdrop">
-          <div className="pitch-modal-card">
-            <div className="pitch-modal-icon-wrap">
-              <CheckCircle2 style={{ width: 32, height: 32 }} />
-            </div>
+        <div className="pitch-modal-backdrop no-scrollbar">
+          {modalStep === "summary_qr" ? (
+            /* Bước 1: Tóm tắt thông tin đơn đặt & Quét mã QR giả lập */
+            <div className="pitch-modal-card pitch-modal-card-lg no-scrollbar">
+              {/* Nút đóng modal */}
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="pitch-modal-close-btn"
+                title="Đóng cửa sổ"
+              >
+                <X style={{ width: 16, height: 16 }} />
+              </button>
 
-            <div className="pitch-modal-center-header">
-              <span className="pitch-modal-kicker">Match Reserved</span>
-              <h3 className="pitch-modal-heading">Booking Confirmed!</h3>
-              <p className="pitch-modal-code-text">
-                Confirmation code:{" "}
-                <strong className="pitch-modal-code-val">#BK-9201</strong>
-              </p>
-            </div>
-
-            <div className="pitch-modal-recap-box">
-              <div className="pitch-modal-recap-row">
-                <span>Venue:</span>
-                <strong>{pitch.name}</strong>
+              {/* Modal Top Header */}
+              <div className="pitch-modal-top-header">
+                <span className="pitch-modal-kicker">
+                  BƯỚC 1 / 2: XÁC NHẬN ĐƠN & THANH TOÁN
+                </span>
+                <h3
+                  className="pitch-modal-heading"
+                  style={{ fontSize: "1.375rem", marginTop: "0.25rem" }}
+                >
+                  Tóm tắt đơn đặt sân & Quét mã QR
+                </h3>
+                <p
+                  className="pitch-modal-code-text"
+                  style={{ marginTop: "0.25rem" }}
+                >
+                  Mã đơn hàng tạm thời:{" "}
+                  <strong className="pitch-modal-code-val">
+                    #{bookingCode}
+                  </strong>
+                </p>
               </div>
-              <div className="pitch-modal-recap-row">
-                <span>Total Amount:</span>
-                <strong
+
+              {/* Modal Flow Grid: Left Summary vs Right VietQR */}
+              <div className="pitch-modal-flow-grid">
+                {/* Cột trái: Tóm tắt chi tiết đơn đặt sân */}
+                <div className="pitch-modal-summary-panel">
+                  {/* Khối 1: Thông tin sân bóng & Lịch thi đấu */}
+                  <div className="pitch-summary-section">
+                    <div className="pitch-summary-section-title">
+                      <Calendar style={{ width: 14, height: 14 }} />
+                      <span>Thông tin sân bóng & Lịch thi đấu</span>
+                    </div>
+                    <div className="pitch-summary-field-row">
+                      <span className="pitch-summary-field-lbl">Sân bóng:</span>
+                      <span className="pitch-summary-field-val">
+                        {pitch.name}
+                      </span>
+                    </div>
+                    <div className="pitch-summary-field-row">
+                      <span className="pitch-summary-field-lbl">Loại sân:</span>
+                      <span className="pitch-summary-field-val">
+                        <span className="pitch-summary-slot-pill">
+                          {pitch.pitchType}
+                        </span>
+                        <span
+                          style={{
+                            marginLeft: "0.375rem",
+                            fontSize: "0.75rem",
+                            color: "#9ca3af",
+                          }}
+                        >
+                          ({pitch.surface})
+                        </span>
+                      </span>
+                    </div>
+                    <div className="pitch-summary-field-row">
+                      <span className="pitch-summary-field-lbl">Địa chỉ:</span>
+                      <span
+                        className="pitch-summary-field-val"
+                        style={{ fontSize: "0.75rem" }}
+                      >
+                        {pitch.address}, {pitch.city}
+                      </span>
+                    </div>
+                    <div className="pitch-summary-field-row">
+                      <span className="pitch-summary-field-lbl">
+                        Ngày thi đấu:
+                      </span>
+                      <span
+                        className="pitch-summary-field-val"
+                        style={{ color: "var(--color-neon-primary)" }}
+                      >
+                        {selectedDate}
+                      </span>
+                    </div>
+                    <div
+                      className="pitch-summary-field-row"
+                      style={{ alignItems: "flex-start" }}
+                    >
+                      <span className="pitch-summary-field-lbl">
+                        Khung giờ ({selectedSlots.length}):
+                      </span>
+                      <div className="pitch-summary-field-val">
+                        <div className="pitch-slots-pill-list">
+                          {selectedSlots.map((slot) => (
+                            <span
+                              key={slot._id}
+                              className="pitch-summary-slot-pill"
+                            >
+                              {slot.time} (
+                              {new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              }).format(slot.price || 0)}
+                              )
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Khối 2: Thông tin người đặt */}
+                  <div className="pitch-summary-section">
+                    <div className="pitch-summary-section-title">
+                      <User style={{ width: 14, height: 14 }} />
+                      <span>Thông tin người đặt</span>
+                    </div>
+                    <div className="pitch-summary-field-row">
+                      <span className="pitch-summary-field-lbl">
+                        Họ và tên:
+                      </span>
+                      <span className="pitch-summary-field-val">
+                        {organizerName}
+                      </span>
+                    </div>
+                    <div className="pitch-summary-field-row">
+                      <span className="pitch-summary-field-lbl">
+                        Số điện thoại:
+                      </span>
+                      <span
+                        className="pitch-summary-field-val"
+                        style={{ fontFamily: "var(--font-mono)" }}
+                      >
+                        {organizerPhone}
+                      </span>
+                    </div>
+                    {organizerNote && (
+                      <div className="pitch-summary-field-row">
+                        <span className="pitch-summary-field-lbl">
+                          Ghi chú:
+                        </span>
+                        <span
+                          className="pitch-summary-field-val"
+                          style={{ fontStyle: "italic", fontSize: "0.75rem" }}
+                        >
+                          {organizerNote}
+                        </span>
+                      </div>
+                    )}
+                    <div className="pitch-summary-field-row">
+                      <span className="pitch-summary-field-lbl">
+                        Phương thức:
+                      </span>
+                      <span
+                        className="pitch-summary-field-val"
+                        style={{ color: "#60a5fa" }}
+                      >
+                        {paymentMethod === "vnpay"
+                          ? "Chuyển khoản VietQR 24/7"
+                          : paymentMethod === "venue"
+                            ? "Thanh toán tại sân"
+                            : "Ví MoMo"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Khối 3: Bảng tổng tiền */}
+                  <div className="pitch-summary-total-card">
+                    <div>
+                      <div
+                        style={{
+                          fontSize: "0.6875rem",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.05em",
+                          color: "#9ca3af",
+                          fontWeight: 700,
+                        }}
+                      >
+                        Tổng tiền thanh toán
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "0.6875rem",
+                          color: "#6ee7b7",
+                          marginTop: "0.125rem",
+                        }}
+                      >
+                        ✓ Miễn phí phí dịch vụ & đặt cọc
+                      </div>
+                    </div>
+                    <div className="pitch-summary-total-amt">
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(totalPrice || 0)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cột phải: Thẻ VietQR giả lập & Nút xác nhận thanh toán tạm thời */}
+                <div>
+                  <MockVietQRCard
+                    bookingCode={bookingCode}
+                    pitchName={pitch.name}
+                    amount={totalPrice}
+                    customerPhone={organizerPhone}
+                  />
+
+                  {/* Hộp nút xác nhận thanh toán tạm thời (Sau này sẽ xóa đi) */}
+                  <div className="pitch-temp-test-box">
+                    <div className="pitch-temp-test-header">
+                      <Sparkles style={{ width: 14, height: 14 }} />
+                      <span>Thử nghiệm thanh toán (Test Mode)</span>
+                    </div>
+                    <p className="pitch-temp-test-text">
+                      Tính năng nhận diện giao dịch tự động qua Webhook ngân
+                      hàng đang được kết nối. Bạn hãy nhấn nút dưới đây để mô
+                      phỏng hoàn tất thanh toán.
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={handleSimulatePayment}
+                      disabled={isProcessingPayment}
+                      className="pitch-temp-confirm-btn"
+                    >
+                      {isProcessingPayment ? (
+                        <>
+                          <RefreshCw
+                            style={{ width: 16, height: 16 }}
+                            className="animate-spin"
+                          />
+                          <span>Đang kiểm tra giao dịch chuyển khoản...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 style={{ width: 18, height: 18 }} />
+                          <span>Xác nhận thanh toán</span>
+                          <span className="pitch-temp-badge">
+                            Sau này sẽ xóa
+                          </span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Nút hủy / quay lại */}
+                  <div style={{ marginTop: "0.75rem", textAlign: "center" }}>
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(false)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#9ca3af",
+                        fontSize: "0.75rem",
+                        cursor: "pointer",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      Quay lại thay đổi thông tin
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Bước 2: Thông báo đặt sân thành công */
+            <div className="pitch-modal-card no-scrollbar">
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="pitch-modal-close-btn"
+                title="Đóng"
+              >
+                <X style={{ width: 16, height: 16 }} />
+              </button>
+
+              <div className="pitch-modal-icon-wrap">
+                <CheckCircle2 style={{ width: 34, height: 34 }} />
+              </div>
+
+              <div className="pitch-modal-center-header">
+                <span className="pitch-modal-kicker">GIAO DỊCH HOÀN TẤT</span>
+                <h3 className="pitch-modal-heading">Đặt sân thành công!</h3>
+                <div
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    color: "var(--color-neon-primary)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    marginTop: "0.375rem",
                   }}
                 >
-                  {totalPrice}
-                </strong>
+                  <span
+                    className="pitch-modal-code-text"
+                    style={{ margin: 0 }}
+                  >
+                    Mã đơn đặt sân:
+                  </span>
+                  <strong className="pitch-modal-code-val">
+                    #{bookingCode}
+                  </strong>
+                  <button
+                    type="button"
+                    onClick={handleCopyBookingCode}
+                    className={`pitch-copy-btn ${copiedCode ? "copied" : ""}`}
+                    style={{ marginLeft: "0.25rem" }}
+                  >
+                    {copiedCode ? (
+                      <Check style={{ width: 11, height: 11 }} />
+                    ) : (
+                      <Copy style={{ width: 11, height: 11 }} />
+                    )}
+                    <span>{copiedCode ? "Đã chép" : "Chép mã"}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Tóm tắt vé đặt sân */}
+              <div className="pitch-modal-recap-box">
+                <div className="pitch-modal-recap-row">
+                  <span>Sân bóng:</span>
+                  <strong>
+                    {pitch.name} ({pitch.pitchType})
+                  </strong>
+                </div>
+                <div className="pitch-modal-recap-row">
+                  <span>Ngày thi đấu:</span>
+                  <strong style={{ color: "var(--color-neon-primary)" }}>
+                    {selectedDate}
+                  </strong>
+                </div>
+                <div className="pitch-modal-recap-row">
+                  <span>Khung giờ:</span>
+                  <strong>{selectedSlots.map((s) => s.time).join(", ")}</strong>
+                </div>
+                <div className="pitch-modal-recap-row">
+                  <span>Người đặt:</span>
+                  <strong>
+                    {organizerName} ({organizerPhone})
+                  </strong>
+                </div>
+                <div className="pitch-modal-recap-total">
+                  <span>Số tiền đã thanh toán:</span>
+                  <strong
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      color: "var(--color-neon-primary)",
+                      fontSize: "1rem",
+                    }}
+                  >
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(totalPrice || 0)}
+                  </strong>
+                </div>
+              </div>
+
+              {/* Nút điều hướng */}
+              <div className="pitch-modal-btn-grid">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowModal(false);
+                    navigate("/discovery");
+                  }}
+                  className="pitch-modal-btn-primary"
+                >
+                  <ArrowRight style={{ width: 15, height: 15 }} />
+                  <span>Tiếp tục tìm sân</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowModal(false);
+                    navigate("/user-dashboard");
+                  }}
+                  className="pitch-modal-btn-secondary"
+                >
+                  <span>Xem lịch trong Dashboard</span>
+                </button>
               </div>
             </div>
-
-            <div className="pitch-modal-btn-grid">
-              <button
-                onClick={() => {
-                  setShowModal(false);
-                  navigate("/dashboard");
-                }}
-                className="pitch-modal-btn-primary"
-              >
-                View in Dashboard
-              </button>
-              <button
-                onClick={() => setShowModal(false)}
-                className="pitch-modal-btn-secondary"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       )}
     </div>
