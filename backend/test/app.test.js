@@ -186,9 +186,7 @@ describe('Test các API của ứng dụng (Database Memory Server)', () => {
     test('POST /api/timeSlot tạo khung giờ mới (Pitch Owner)', async () => {
       const newTimeSlot = { 
         pitchId: createdPitchId, 
-        start_time: new Date('2026-10-02T07:00:00Z'), 
-        end_time: new Date('2026-10-02T09:00:00Z'), 
-        date: new Date('2026-10-02'),
+        time: '07:00 - 09:00',
         price: 200000 
       };
       

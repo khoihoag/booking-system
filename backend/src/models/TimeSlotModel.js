@@ -13,10 +13,6 @@ const timeSlotSchema = new mongoose.Schema(
             type: String,
             required: [true, 'a time slot must have a time ']
         },
-        // date: {
-        //     type: Date,
-        //     required: [true, 'a time slot must have a date']
-        // },
         status: {
             type: String,
             default: 'available',
