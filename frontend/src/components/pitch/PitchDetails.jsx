@@ -2,19 +2,28 @@ import "./PitchDetails.css";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
+import { formatDateVN, formatVND } from "../utils/Format";
 import {
   MapPin,
   Star,
   Calendar,
+  Clock,
   CheckCircle2,
   ChevronLeft,
   RefreshCw,
+  AlertCircle,
   X,
   Copy,
   Check,
+  ShieldCheck,
   ArrowRight,
   User,
+  Phone,
+  FileText,
   Sparkles,
+  LogIn,
+  UserPlus,
+  ShieldAlert,
 } from "lucide-react";
 import axios from "axios";
 import { MockVietQRCard } from "./MockVietQRCard";
@@ -44,6 +53,8 @@ export default function PitchDetails() {
   );
   const organizerNote = "";
   const [paymentMethod, setPaymentMethod] = useState("vnpay");
+  // Quản lý Modal yêu cầu Đăng nhập & trạng thái Giả lập chưa đăng nhập (Test UI)
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     axios
@@ -156,6 +167,12 @@ export default function PitchDetails() {
 
   // Mở popup xác nhận đơn đặt & quét mã QR
   const handleConfirmBooking = () => {
+    // Kiểm tra trạng thái đăng nhập (hoặc đang bật giả lập chưa đăng nhập)
+    if (!currentUser) {
+      setShowAuthModal(true);
+      return;
+    }
+
     if (selectedSlotIds.length === 0) {
       // addToast(
       //   "warning",
@@ -186,6 +203,8 @@ export default function PitchDetails() {
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
   };
+
+
 
   if (!pitch) {
     return <div className="loading">Đang tải thông tin sân bóng...</div>;
@@ -1054,6 +1073,121 @@ export default function PitchDetails() {
               </div>
             </div>
           )}
+        </div>
+      )}
+      {/* Modal Thông báo Yêu cầu Đăng nhập / Đăng ký khi đặt sân */}
+      {showAuthModal && (
+        <div className="pitch-modal-backdrop no-scrollbar">
+          <div className="pitch-modal-card pitch-auth-modal-card no-scrollbar">
+            {/* Nút đóng */}
+            <button
+              type="button"
+              onClick={() => setShowAuthModal(false)}
+              className="pitch-modal-close-btn"
+              title="Đóng thông báo"
+            >
+              <X style={{ width: 16, height: 16 }} />
+            </button>
+
+            {/* Icon nhận diện */}
+            <div className="pitch-auth-icon-badge">
+              <ShieldAlert style={{ width: 32, height: 32 }} />
+            </div>
+
+            {/* Tiêu đề & nội dung */}
+            <div className="pitch-auth-modal-header">
+              <span className="pitch-modal-kicker">
+                YÊU CẦU XÁC THỰC TÀI KHOẢN
+              </span>
+              <h3
+                className="pitch-modal-heading"
+                style={{ fontSize: "1.375rem", marginTop: "0.25rem" }}
+              >
+                Vui lòng Đăng nhập để Đặt sân
+              </h3>
+              <p className="pitch-auth-modal-desc">
+                Bạn cần đăng nhập tài khoản để xác nhận giữ chỗ sân bóng, nhận
+                mã thanh toán VietQR và lưu vé thi đấu vào bảng điều khiển.
+              </p>
+            </div>
+
+            {/* Tóm tắt sơ lược đơn đang chọn */}
+            <div className="pitch-auth-recap-strip">
+              <div className="pitch-auth-recap-left">
+                <span className="pitch-auth-recap-venue">{pitch.name}</span>
+                <span className="pitch-auth-recap-meta">
+                  {formatDateVN(selectedDate)} ·{" "}
+                  {selectedSlots.length > 0
+                    ? `${selectedSlots.length} ca thi đấu`
+                    : "Chưa chọn ca"}
+                </span>
+              </div>
+              <div className="pitch-auth-recap-price">
+                {formatVND(totalPrice)}
+              </div>
+            </div>
+
+            {/* Lợi ích khi đăng nhập */}
+            <div className="pitch-auth-benefits-list">
+              <div className="pitch-auth-benefit-item">
+                <div className="pitch-auth-benefit-icon">
+                  <ShieldCheck style={{ width: 14, height: 14 }} />
+                </div>
+                <div className="pitch-auth-benefit-text">
+                  <strong>Bảo đảm giữ sân & Chống trùng ca:</strong> Khung giờ
+                  được khóa giữ chỗ ngay sau khi xác nhận.
+                </div>
+              </div>
+
+              <div className="pitch-auth-benefit-item">
+                <div className="pitch-auth-benefit-icon">
+                  <CheckCircle2 style={{ width: 14, height: 14 }} />
+                </div>
+                <div className="pitch-auth-benefit-text">
+                  <strong>Vé điện tử & Tra cứu đơn:</strong> Dễ dàng xuất trình
+                  mã đơn hàng khi tới sân bóng.
+                </div>
+              </div>
+            </div>
+
+            {/* Nhóm nút hành động chính */}
+            <div className="pitch-auth-action-stack">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAuthModal(false);
+                  setCurrentPage("signin");
+                }}
+                className="pitch-auth-btn-signin"
+              >
+                <LogIn style={{ width: 16, height: 16 }} />
+                <span>Đăng nhập tài khoản</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAuthModal(false);
+                  setCurrentPage("signup");
+                }}
+                className="pitch-auth-btn-signup"
+              >
+                <UserPlus style={{ width: 16, height: 16 }} />
+                <span>Đăng ký tài khoản mới</span>
+              </button>
+            </div>
+
+            {/* Nút đóng / Để sau */}
+            <div className="pitch-auth-dismiss-row">
+              <button
+                type="button"
+                onClick={() => setShowAuthModal(false)}
+                className="pitch-auth-dismiss-link"
+              >
+                Để sau, tôi muốn xem lại thông tin sân
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
