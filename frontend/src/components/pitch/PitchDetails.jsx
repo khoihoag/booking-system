@@ -7,19 +7,15 @@ import {
   MapPin,
   Star,
   Calendar,
-  Clock,
   CheckCircle2,
   ChevronLeft,
   RefreshCw,
-  AlertCircle,
   X,
   Copy,
   Check,
   ShieldCheck,
   ArrowRight,
   User,
-  Phone,
-  FileText,
   Sparkles,
   LogIn,
   UserPlus,
@@ -39,11 +35,24 @@ export default function PitchDetails() {
   const [selectedDate, setSelectedDate] = useState(() => {
     return new Date().toISOString().split("T")[0];
   });
-  // Quản lý Modal đặt sân & quy trình thanh toán
-  const [showModal, setShowModal] = useState(() => {
-    const pendingBooking = sessionStorage.getItem("booking");
-    return pendingBooking ? true : false;
+
+  // Lưu thông tin booking chờ khôi phục
+  const [pendingBooking, setPendingBooking] = useState(() => {
+    const savedBooking = sessionStorage.getItem("booking");
+
+    if (!savedBooking) return null;
+
+    try {
+      return JSON.parse(savedBooking);
+    } catch {
+      sessionStorage.removeItem("booking");
+      return null;
+    }
   });
+
+  // Quản lý Modal đặt sân & quy trình thanh toán
+  // Chỉ mở modal sau khi đã khôi phục dữ liệu
+  const [showModal, setShowModal] = useState(false);
   const [modalStep, setModalStep] = useState("summary_qr");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [bookingCode, setBookingCode] = useState("BK-9201");
@@ -67,7 +76,11 @@ export default function PitchDetails() {
         const pitchRes = res.data;
         setPitch(pitchRes.data);
         setActiveImage(pitchRes.data?.imageUrl);
-        setTimeSlots(pitchRes.data.time_slots);
+        setTimeSlots(
+          Array.isArray(pitchRes.data?.time_slots)
+            ? pitchRes.data.time_slots
+            : [],
+        );
       })
       .catch((err) => {
         console.log(err);
@@ -82,6 +95,41 @@ export default function PitchDetails() {
         : [...prev, slotId],
     );
   };
+
+  // Khôi phục dữ liệu sau khi đăng nhập trước khi thực hiện thanh toán
+  useEffect(() => {
+    if (!pendingBooking || timeSlots.length === 0) return;
+
+    // Đảm bảo booking thuộc đúng sân hiện tại
+    if (String(pendingBooking.pitchId) !== String(id)) return;
+
+    const pendingSlotIds = Array.isArray(pendingBooking.selectedSlotIds)
+      ? pendingBooking.selectedSlotIds
+      : [];
+
+    // Khôi phục ngày đã chọn
+    if (pendingBooking.date) setSelectedDate(pendingBooking.date);
+
+    // Lấy lại những ca đã chọn từ danh sách API
+    const restoredSlotIds = timeSlots
+      .filter(
+        (slot) =>
+          pendingSlotIds.includes(slot._id) && !slot.isBooked,
+      )
+      .map((slot) => slot._id);
+
+    setSelectedSlotIds(restoredSlotIds);
+
+    // Chỉ mở modal khi khôi phục được các ca
+    if (restoredSlotIds.length > 0) {
+      setModalStep("summary_qr");
+      setShowModal(true);
+    }
+
+    // Khôi phục xong thì xóa dữ liệu tạm
+    sessionStorage.removeItem("booking");
+    setPendingBooking(null);
+  }, [pendingBooking, timeSlots, id]);
 
   // Tính tổng tiền của các timeSlot đã chọn
   const totalPrice = timeSlots
@@ -209,13 +257,16 @@ export default function PitchDetails() {
   };
 
   const goAuth = (page) => {
-    const pendingBooking = {
-      pitchId: pitch._id,
-      selectedSlots: selectedSlots.map((slot) => slot._id),
+    const pitchId = pitch?._id || pitch?.id || id;
+    if (!pitchId) return;
+
+    const bookingData = {
+      pitchId,
+      date: selectedDate,
+      selectedSlotIds,
     };
 
-    sessionStorage.setItem("booking", JSON.stringify(pendingBooking));
-    // setShowAuthModal(false);
+    sessionStorage.setItem("booking", JSON.stringify(bookingData));
     navigate(page);
   };
 
@@ -249,7 +300,6 @@ export default function PitchDetails() {
         {/* Pitch Title & Quick Stats Header */}
         <div className="pitch-header-wrap">
           <div>
-            21
             <div className="pitch-type-tag-row">
               <span className="pitch-type-chip">{pitch.pitchType}</span>
               {/* <span className="pitch-surface-chip">
