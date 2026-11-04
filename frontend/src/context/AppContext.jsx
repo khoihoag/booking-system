@@ -12,7 +12,11 @@ const defaultUser = {
 };
 
 export const AppProvider = ({children}) => {
-    const [currentUser, setCurrentUser] = useState(defaultUser)
+    const [currentUser, setCurrentUser] = useState(() => {
+        const user = localStorage.getItem('user')
+
+        return user ? JSON.parse(user) : null
+    })
 
     const value = {
         currentUser,

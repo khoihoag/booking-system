@@ -32,13 +32,20 @@ export default function SignIn() {
         email: email,
         password: password
       })
-      const resUser = response.data.user
-      setCurrentUser({
-        id: resUser.id,
-        email: resUser.email,
-        name: resUser.name,
-        role: resUser.role
-      })
+      
+      const user = {
+        id: response.data.user._id,
+        email: response.data.user.email,
+        name: response.data.user.name,
+        role: response.data.user.role
+      }
+      const token = response.data.token
+      
+      // TODO: sau này chuyển token lên cookie
+      localStorage.setItem('token', token)  
+      localStorage.setItem('user', JSON.stringify(user))
+
+      setCurrentUser(user)
       navigate("/");
     } catch(err) {
       setErrorMsg(err.response?.data?.message || "DDD")

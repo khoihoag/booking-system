@@ -34,6 +34,8 @@ export default function () {
   const handleSignOut = () => {
     setUserDropdownOpen(false);
     setCurrentUser(null);
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
   };
 
   return (
