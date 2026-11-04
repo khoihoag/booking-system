@@ -40,7 +40,10 @@ export default function PitchDetails() {
     return new Date().toISOString().split("T")[0];
   });
   // Quản lý Modal đặt sân & quy trình thanh toán
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(() => {
+    const pendingBooking = sessionStorage.getItem("booking");
+    return pendingBooking ? true : false;
+  });
   const [modalStep, setModalStep] = useState("summary_qr");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [bookingCode, setBookingCode] = useState("BK-9201");
@@ -53,6 +56,7 @@ export default function PitchDetails() {
   );
   const organizerNote = "";
   const [paymentMethod, setPaymentMethod] = useState("vnpay");
+
   // Quản lý Modal yêu cầu Đăng nhập & trạng thái Giả lập chưa đăng nhập (Test UI)
   const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -204,7 +208,16 @@ export default function PitchDetails() {
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
+  const goAuth = (page) => {
+    const pendingBooking = {
+      pitchId: pitch._id,
+      selectedSlots: selectedSlots.map((slot) => slot._id),
+    };
 
+    sessionStorage.setItem("booking", JSON.stringify(pendingBooking));
+    // setShowAuthModal(false);
+    navigate(page);
+  };
 
   if (!pitch) {
     return <div className="loading">Đang tải thông tin sân bóng...</div>;
@@ -474,7 +487,6 @@ export default function PitchDetails() {
                     Morning Sessions (06:00 - 12:00)
                   </div>
                   <div className="pitch-slots-btn-grid">
-                    {console.log(1)}
                     {timeSlots
                       .filter((s) => getShiftFromTime(s.time) === "Morning")
                       .map((slot) => {
@@ -1155,8 +1167,7 @@ export default function PitchDetails() {
               <button
                 type="button"
                 onClick={() => {
-                  setShowAuthModal(false);
-                  setCurrentPage("signin");
+                  goAuth("/signin");
                 }}
                 className="pitch-auth-btn-signin"
               >
@@ -1167,8 +1178,7 @@ export default function PitchDetails() {
               <button
                 type="button"
                 onClick={() => {
-                  setShowAuthModal(false);
-                  setCurrentPage("signup");
+                  goAuth("/signup");
                 }}
                 className="pitch-auth-btn-signup"
               >
@@ -1193,4 +1203,3 @@ export default function PitchDetails() {
     </div>
   );
 }
-// asdjfhaksjdfasdfasdfasd

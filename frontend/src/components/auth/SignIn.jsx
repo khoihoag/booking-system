@@ -15,7 +15,7 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const  handleSignIn = async (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
     setErrorMsg("");
 
@@ -46,6 +46,15 @@ export default function SignIn() {
       localStorage.setItem('user', JSON.stringify(user))
 
       setCurrentUser(user)
+
+      const pendingBooking = JSON.parse(sessionStorage.getItem('booking'))
+
+      if (pendingBooking) {
+        console.log(pendingBooking)
+        navigate(`/pitch-detail/${pendingBooking.pitchId}`)
+        return
+      }
+
       navigate("/");
     } catch(err) {
       setErrorMsg(err.response?.data?.message || "DDD")
@@ -159,3 +168,6 @@ export default function SignIn() {
     </div>
   );
 }
+
+// http://localhost:5173/pitch-details/6adf2b24bac24928eef65f3d
+// http://localhost:5173/pitch-detail/6adf2b24bac24928eef65f3d
