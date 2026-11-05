@@ -35,15 +35,13 @@ exports.login = catchAsync(async (req, res, next) => {
 
 // Middleware bảo vệ route (yêu cầu login)
 exports.protect = catchAsync(async (req, res, next) => {
-  
     let token = req.cookies.jwt;
+    if (!token && req.headers.authorization?.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
     const currentUser = await authServices.protect(token);
-    console.log(3);
     req.user = currentUser;
     next();
-  // if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-  //     token = req.headers.authorization.split(' ')[1]
-  // }
 });
 
 // Middleware phân quyền

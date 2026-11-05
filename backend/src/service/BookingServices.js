@@ -6,21 +6,24 @@ exports.createBooking = async (data) => {
     
     const { timeSlotId, userId } = data;
 
-    // Kiểm tra danh sách timeSlotId
-    if (!Array.isArray(timeSlotId) || timeSlotId.length === 0) {
-        throw new AppError('Please provide at least one timeSlotId', 400);
+    const isMultiple = Array.isArray(timeSlotId);
+    const timeSlotIds = isMultiple ? timeSlotId : [timeSlotId];
+
+    if (timeSlotIds.length === 0 || !timeSlotIds[0]) {
+        throw new AppError('Please provide a timeSlotId for booking', 400);
     }
 
     // Kiểm tra các ID bị trùng
-    if (new Set(timeSlotId.map(String)).size !== timeSlotId.length) {
+    if (new Set(timeSlotIds.map(String)).size !== timeSlotIds.length) {
         throw new AppError('Duplicate timeSlotId is not allowed', 400);
     }
 
-    // Tìm tất cả time slots
-    const timeSlots = await timeSlotRepository.findByIds(timeSlotId);
+    const timeSlots = isMultiple
+        ? await timeSlotRepository.findByIds(timeSlotIds)
+        : [await timeSlotRepository.findById(timeSlotId)];
 
-    if (timeSlots.length !== timeSlotId.length) {
-        throw new AppError('One or more time slots were not found', 404);
+    if (timeSlots.some(slot => !slot)) {
+        throw new AppError(isMultiple ? 'One or more time slots were not found' : 'No time slot found with that ID', 404);
     }
 
     // Kiểm tra trạng thái của tất cả slots
@@ -30,16 +33,17 @@ exports.createBooking = async (data) => {
 
     if (unavailableSlot) {
         throw new AppError(
-            'One or more time slots are not available for booking',
+            isMultiple ? 'One or more time slots are not available for booking' : 'This time slot is not available for booking',
             400
         );
     }
 
     // Cập nhật trạng thái tất cả slots thành booked
-    await timeSlotRepository.updateMany(
-        timeSlotId,
-        { status: 'booked' }
-    );
+    if (isMultiple) {
+        await timeSlotRepository.updateMany(timeSlotIds, { status: 'booked' });
+    } else {
+        await timeSlotRepository.update(timeSlotId, { status: 'booked' });
+    }
 
     // Tạo booking
     const booking = await bookingRepository.create({
@@ -71,9 +75,12 @@ exports.updateBooking = async (id, data) => {
 
     // Nếu hủy booking thì chuyển status của timeSlot về 'available'
     if (data.status === 'cancelled' && booking.status !== 'cancelled') {
-        const slotId = booking.timeSlotId._id || booking.timeSlotId
-        if (slotId) {
-            await timeSlotRepository.update(slotId, { status: 'available' })
+        const slotIds = Array.isArray(booking.timeSlotId)
+            ? booking.timeSlotId
+            : [booking.timeSlotId]
+        for (const slot of slotIds) {
+            const slotId = slot?._id || slot
+            if (slotId) await timeSlotRepository.update(slotId, { status: 'available' })
         }
     }
 
@@ -95,9 +102,12 @@ exports.cancelBooking = async (id, user) => {
     }
 
     if (booking.status !== 'cancelled') {
-        const slotId = booking.timeSlotId?._id || booking.timeSlotId
-        if (slotId) {
-            await timeSlotRepository.update(slotId, { status: 'available' })
+        const slotIds = Array.isArray(booking.timeSlotId)
+            ? booking.timeSlotId
+            : [booking.timeSlotId]
+        for (const slot of slotIds) {
+            const slotId = slot?._id || slot
+            if (slotId) await timeSlotRepository.update(slotId, { status: 'available' })
         }
     }
 

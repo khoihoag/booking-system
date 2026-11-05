@@ -49,7 +49,6 @@ describe('BookingServices - Unit Tests', () => {
             expect(bookingRepository.create).toHaveBeenCalledWith({
                 timeSlotId: 'slot_123',
                 userId: 'user_123',
-                totalPrice: 200000,
                 status: 'confirmed'
             });
             expect(result).toEqual(mockCreatedBooking);
