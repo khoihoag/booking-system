@@ -34,11 +34,10 @@ exports.login = catchAsync(async (req, res, next) => {
 
 // Middleware bảo vệ route (yêu cầu login)
 exports.protect = catchAsync(async (req, res, next) => {
-    let token
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        token = req.headers.authorization.split(' ')[1]
-    }
-
+    let token = req.cookie.jwt
+    // if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    //     token = req.headers.authorization.split(' ')[1]
+    // }
     const currentUser = await authServices.protect(token)
     req.user = currentUser
     next()
