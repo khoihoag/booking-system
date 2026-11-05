@@ -3,35 +3,53 @@ const timeSlotRepository = require('../repositories/TimeSlotRepository')
 const AppError = require('../utils/AppError')
 
 exports.createBooking = async (data) => {
-    const { timeSlotId, userId, totalPrice } = data
+    
+    const { timeSlotId, userId } = data;
 
-    if (!timeSlotId) {
-        throw new AppError('Please provide a timeSlotId for booking', 400)
+    // Kiểm tra danh sách timeSlotId
+    if (!Array.isArray(timeSlotId) || timeSlotId.length === 0) {
+        throw new AppError('Please provide at least one timeSlotId', 400);
     }
 
-    const timeSlot = await timeSlotRepository.findById(timeSlotId)
-    if (!timeSlot) {
-        throw new AppError('No time slot found with that ID', 404)
+    // Kiểm tra các ID bị trùng
+    if (new Set(timeSlotId.map(String)).size !== timeSlotId.length) {
+        throw new AppError('Duplicate timeSlotId is not allowed', 400);
     }
 
-    if (timeSlot.status !== 'available') {
-        throw new AppError('This time slot is not available for booking', 400)
+    // Tìm tất cả time slots
+    const timeSlots = await timeSlotRepository.findByIds(timeSlotId);
+
+    if (timeSlots.length !== timeSlotId.length) {
+        throw new AppError('One or more time slots were not found', 404);
     }
 
-    const finalPrice = totalPrice !== undefined ? totalPrice : timeSlot.price
+    // Kiểm tra trạng thái của tất cả slots
+    const unavailableSlot = timeSlots.find(
+        slot => slot.status !== 'available'
+    );
 
-    // Cập nhật trạng thái slot thành 'booked'
-    await timeSlotRepository.update(timeSlotId, { status: 'booked' })
+    if (unavailableSlot) {
+        throw new AppError(
+            'One or more time slots are not available for booking',
+            400
+        );
+    }
 
+    // Cập nhật trạng thái tất cả slots thành booked
+    await timeSlotRepository.updateMany(
+        timeSlotId,
+        { status: 'booked' }
+    );
+
+    // Tạo booking
     const booking = await bookingRepository.create({
         timeSlotId,
         userId,
-        totalPrice: finalPrice,
         status: 'confirmed'
-    })
+    });
 
-    return booking
-}
+    return booking;
+};
 
 exports.getAllBookings = async () => {
     return bookingRepository.findAll()

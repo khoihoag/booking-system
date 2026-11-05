@@ -6,7 +6,6 @@ exports.createBooking = catchAsync(async (req, res, next) => {
     const bookingData = {
         userId: req.user._id,
         timeSlotId: req.body.timeSlotId,
-        totalPrice: req.body.totalPrice
     }
 
     const booking = await bookingServices.createBooking(bookingData)

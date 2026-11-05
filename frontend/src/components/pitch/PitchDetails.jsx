@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import { formatDateVN, formatVND } from "../utils/Format";
+import api from './../../services/api'
 import {
   MapPin,
   Star,
@@ -242,8 +243,24 @@ export default function PitchDetails() {
   };
 
   // Nút tạm thời: Xác nhận thanh toán (Mô phỏng quy trình thanh toán thành công)
-  const handleSimulatePayment = () => {
-    setIsProcessingPayment(true);
+  const handleSimulatePayment = async () => {
+
+    try {
+      setIsProcessingPayment(true);
+      
+      const response = await api.post('/booking', {
+          timeSlotId: selectedSlotIds
+      })
+
+      console.log(1)
+      setModalStep('success')
+    } catch(err) {
+      console.log(err)
+    } finally {
+      setIsProcessingPayment(false)
+    }
+
+
     setTimeout(() => {
       setIsProcessingPayment(false);
       setModalStep("success"); // Chuyển sang bước thông báo thành công
@@ -1173,7 +1190,7 @@ export default function PitchDetails() {
               </p>
             </div>
 
-            {/* Tóm tắt sơ lược đơn đang chọn */}
+            {/* Tóm tắt sơ lược đơn đang chọn
             <div className="pitch-auth-recap-strip">
               <div className="pitch-auth-recap-left">
                 <span className="pitch-auth-recap-venue">{pitch.name}</span>
@@ -1187,7 +1204,7 @@ export default function PitchDetails() {
               <div className="pitch-auth-recap-price">
                 {formatVND(totalPrice)}
               </div>
-            </div>
+            </div> */}
 
             {/* Lợi ích khi đăng nhập */}
             <div className="pitch-auth-benefits-list">

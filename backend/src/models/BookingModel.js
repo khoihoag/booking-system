@@ -3,19 +3,15 @@ const { Schema } = mongoose
 
 const bookingSchema = new mongoose.Schema(
     {
-        timeSlotId: {
+        timeSlotId: [{
             type: Schema.Types.ObjectId,
             ref: 'time_slots',
             required: [true, 'A booking must have a time slot']
-        },
+        }],
         userId: {
             type: Schema.Types.ObjectId,
             ref: 'users',
             required: [true, 'A booking must belong to a user']
-        },
-        totalPrice: {
-            type: Number,
-            required: [true, 'A booking must have a total price']
         },
         status: {
             type: String,
