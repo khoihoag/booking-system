@@ -3,24 +3,31 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import { formatDateVN, formatVND } from "../utils/Format";
-import api from './../../services/api'
+import api from "./../../services/api";
 import {
   MapPin,
   Star,
   Calendar,
+  Clock,
   CheckCircle2,
   ChevronLeft,
   RefreshCw,
+  AlertCircle,
   X,
   Copy,
   Check,
   ShieldCheck,
   ArrowRight,
   User,
+  Phone,
+  FileText,
   Sparkles,
   LogIn,
   UserPlus,
   ShieldAlert,
+  XCircle,
+  AlertTriangle,
+  RotateCcw,
 } from "lucide-react";
 import axios from "axios";
 import { MockVietQRCard } from "./MockVietQRCard";
@@ -70,6 +77,9 @@ export default function PitchDetails() {
   // Quản lý Modal yêu cầu Đăng nhập & trạng thái Giả lập chưa đăng nhập (Test UI)
   const [showAuthModal, setShowAuthModal] = useState(false);
 
+  const [failReason, setFailReason] = useState('slot_taken');
+
+
   useEffect(() => {
     axios
       .get(`/api/pitch/${id}`)
@@ -113,10 +123,7 @@ export default function PitchDetails() {
 
     // Lấy lại những ca đã chọn từ danh sách API
     const restoredSlotIds = timeSlots
-      .filter(
-        (slot) =>
-          pendingSlotIds.includes(slot._id) && !slot.isBooked,
-      )
+      .filter((slot) => pendingSlotIds.includes(slot._id) && !slot.isBooked)
       .map((slot) => slot._id);
 
     setSelectedSlotIds(restoredSlotIds);
@@ -244,26 +251,25 @@ export default function PitchDetails() {
 
   // Nút tạm thời: Xác nhận thanh toán (Mô phỏng quy trình thanh toán thành công)
   const handleSimulatePayment = async () => {
-
     try {
       setIsProcessingPayment(true);
-      
-      const response = await api.post('/booking', {
-          timeSlotId: selectedSlotIds
-      })
 
-      console.log(1)
-      setModalStep('success')
-    } catch(err) {
-      console.log(err)
+      const response = await api.post("/booking", {
+        timeSlotId: selectedSlotIds,
+      });
+
+      console.log(1);
+      setModalStep("success");
+    } catch (err) {
+      setModalStep("failes")
+      console.log(err);
     } finally {
-      setIsProcessingPayment(false)
+      setIsProcessingPayment(false);
     }
-
 
     setTimeout(() => {
       setIsProcessingPayment(false);
-      setModalStep("success"); // Chuyển sang bước thông báo thành công
+      // setModalStep("success"); // Chuyển sang bước thông báo thành công
     }, 650);
   };
 
@@ -1032,7 +1038,7 @@ export default function PitchDetails() {
                 </div>
               </div>
             </div>
-          ) : (
+          ) : modalStep === "success" ? (
             /* Bước 2: Thông báo đặt sân thành công */
             <div className="pitch-modal-card no-scrollbar">
               <button
@@ -1148,6 +1154,233 @@ export default function PitchDetails() {
                   className="pitch-modal-btn-secondary"
                 >
                   <span>Xem lịch trong Dashboard</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Bước 3: Thông báo đặt sân thất bại */
+            <div className="pitch-modal-card no-scrollbar">
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="pitch-modal-close-btn"
+                title="Đóng"
+              >
+                <X style={{ width: 16, height: 16 }} />
+              </button>
+
+              <div className="pitch-fail-icon-wrap">
+                <XCircle style={{ width: 34, height: 34 }} />
+              </div>
+
+              <div className="pitch-modal-center-header">
+                <span className="pitch-modal-fail-kicker">
+                  GIAO DỊCH THẤT BẠI
+                </span>
+                <h3 className="pitch-modal-heading">
+                  Đặt sân chưa thành công!
+                </h3>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    marginTop: "0.375rem",
+                  }}
+                >
+                  <span
+                    className="pitch-modal-code-text"
+                    style={{ margin: 0 }}
+                  >
+                    Mã đơn:
+                  </span>
+                  <strong className="pitch-modal-fail-code-val">
+                    #{bookingCode}
+                  </strong>
+                  <span className="pitch-modal-fail-badge">
+                    <AlertTriangle style={{ width: 11, height: 11 }} />
+                    <span>Đã hủy giữ chỗ</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Hộp giải thích lý do thất bại */}
+              <div className="pitch-fail-reason-box">
+                <div className="pitch-fail-reason-title">
+                  <AlertCircle style={{ width: 14, height: 14 }} />
+                  <span>Nguyên nhân không thể hoàn tất:</span>
+                </div>
+
+                {failReason === "slot_taken" && (
+                  <p className="pitch-fail-reason-desc">
+                    Khung giờ thi đấu{" "}
+                    <strong>
+                      {selectedSlots.map((s) => s.time).join(", ")}
+                    </strong>{" "}
+                    bạn chọn vừa được một đội bóng khác hoàn tất thanh toán
+                    trước vài giây. Hệ thống đã tự động hủy đơn giữ chỗ này để
+                    tránh trùng lịch sân.
+                  </p>
+                )}
+                {failReason === "payment_timeout" && (
+                  <p className="pitch-fail-reason-desc">
+                    Giao dịch chuyển khoản đã quá thời gian chờ (15 phút) hoặc
+                    cổng thanh toán ngân hàng chưa nhận được biên lai giao dịch
+                    hợp lệ.
+                  </p>
+                )}
+                {failReason === "server_error" && (
+                  <p className="pitch-fail-reason-desc">
+                    Hệ thống máy chủ ban quản lý sân bóng đang trong thời gian
+                    bảo trì định kỳ hoặc kết nối đường truyền bị gián đoạn.
+                  </p>
+                )}
+
+                {/* Chọn lý do để test giao diện */}
+                <div className="pitch-fail-reason-test-row">
+                  <span style={{ fontSize: "0.625rem", color: "#94a3b8" }}>
+                    Đổi lý do (Test UI):
+                  </span>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "0.35rem",
+                      flexWrap: "wrap",
+                      marginTop: "0.25rem",
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setFailReason("slot_taken")}
+                      className={`pitch-fail-reason-chip ${failReason === "slot_taken" ? "active" : ""}`}
+                    >
+                      Bị trùng ca đá
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFailReason("payment_timeout")}
+                      className={`pitch-fail-reason-chip ${failReason === "payment_timeout" ? "active" : ""}`}
+                    >
+                      Hết giờ thanh toán
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFailReason("server_error")}
+                      className={`pitch-fail-reason-chip ${failReason === "server_error" ? "active" : ""}`}
+                    >
+                      Bảo trì hệ thống
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pitch-fail-guarantee">
+                  <ShieldCheck
+                    style={{
+                      width: 14,
+                      height: 14,
+                      color: "#38bdf8",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span>
+                    <strong>Cam kết an tâm:</strong> Nếu tài khoản bạn đã trừ
+                    tiền, hệ thống sẽ tự động hoàn 100% trong vòng 5-15 phút.
+                  </span>
+                </div>
+              </div>
+
+              {/* Tóm tắt đơn đặt bị hủy */}
+              <div className="pitch-modal-recap-box">
+                <div className="pitch-modal-recap-row">
+                  <span>Sân bóng:</span>
+                  <strong>
+                    {pitch.name} ({pitch.pitchType})
+                  </strong>
+                </div>
+
+                <div className="pitch-modal-recap-row">
+                  <span>Ngày thi đấu:</span>
+                  <strong style={{ color: "#f87171" }}>
+                    {formatDateVN(selectedDate)}
+                  </strong>
+                </div>
+
+                <div className="pitch-modal-recap-row">
+                  <span>Khung giờ:</span>
+                  <strong
+                    style={{ textDecoration: "line-through", opacity: 0.8 }}
+                  >
+                    {selectedSlots.map((s) => s.time).join(", ")}
+                  </strong>
+                </div>
+
+                <div className="pitch-modal-recap-total">
+                  <span>Số tiền giao dịch:</span>
+                  <div style={{ textAlign: "right" }}>
+                    <strong
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        color: "#f87171",
+                        fontSize: "1rem",
+                      }}
+                    >
+                      {formatVND(totalPrice)}
+                    </strong>
+                    <div
+                      style={{
+                        fontSize: "0.625rem",
+                        color: "#9ca3af",
+                        fontWeight: 400,
+                      }}
+                    >
+                      Chưa thanh toán / Sẽ hoàn trả
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nhóm nút hành động khắc phục */}
+              <div
+                className="pitch-modal-btn-grid"
+                style={{ marginBottom: "0.625rem" }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="pitch-modal-btn-retry"
+                >
+                  <RotateCcw style={{ width: 15, height: 15 }} />
+                  <span>Chọn khung giờ khác</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModalStep("summary_qr")}
+                  className="pitch-modal-btn-secondary"
+                >
+                  <RefreshCw style={{ width: 15, height: 15 }} />
+                  <span>Thử lại thanh toán</span>
+                </button>
+              </div>
+
+              <div className="pitch-modal-btn-grid">
+                <a
+                  href="tel:0908123456"
+                  className="pitch-modal-btn-hotline"
+                >
+                  <Phone style={{ width: 14, height: 14, color: "#38bdf8" }} />
+                  <span>Hotline sân: 0908 123 456</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowModal(false);
+                    setCurrentPage("discovery");
+                  }}
+                  className="pitch-modal-btn-secondary"
+                >
+                  <span>Tìm sân bóng khác</span>
+                  <ArrowRight style={{ width: 14, height: 14 }} />
                 </button>
               </div>
             </div>

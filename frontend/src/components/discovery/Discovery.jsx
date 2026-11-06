@@ -45,7 +45,6 @@ export default function () {
       })
       .catch((err) => setErrorMsg(err.response?.data?.message));
   }, []);
-  console.log(pitches);
 
 
   const getPriceRangeString = (timeSlots) => {
@@ -232,7 +231,6 @@ export default function () {
 
             {/* Populated Pitches Grid */}
             <div className="discovery-cards-grid">
-              {console.log(pitches)}
               {pitches.map((pitch) => (
                 <div
                   key={pitch._id}
