@@ -31,12 +31,15 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { MockVietQRCard } from "./MockVietQRCard";
+import PitchDetailsSkeleton from "./PitchDetailsSkeleton";
 
 export default function PitchDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useApp() || {};
   const [pitch, setPitch] = useState(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasLoadError, setHasLoadError] = useState(false);
   const [activeImage, setActiveImage] = useState();
   const [selectedSlotIds, setSelectedSlotIds] = useState([]);
   const [timeSlots, setTimeSlots] = useState([]);
@@ -80,10 +83,12 @@ export default function PitchDetails() {
   const [failReason, setFailReason] = useState("slot_taken");
 
   useEffect(() => {
+    setIsLoading(true);
+    setHasLoadError(false);
+    setPitch(undefined);
     axios
       .get(`/api/pitch/${id}`)
       .then((res) => {
-        setTimeout(2000)
         const pitchRes = res.data;
         setPitch(pitchRes.data);
         setActiveImage(pitchRes.data?.imageUrl);
@@ -95,6 +100,10 @@ export default function PitchDetails() {
       })
       .catch((err) => {
         console.log(err);
+        setHasLoadError(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }, [id]);
 
@@ -294,7 +303,11 @@ export default function PitchDetails() {
     navigate(page);
   };
 
-  if (!pitch) {
+  if (isLoading) {
+    return <PitchDetailsSkeleton onBack={() => navigate("/discovery")} />;
+  }
+
+  if (!pitch || hasLoadError) {
     return (
       <div className="pitch-fallback-screen">
         <div className="pitch-fallback-card">
