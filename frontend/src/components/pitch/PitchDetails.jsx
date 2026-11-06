@@ -625,7 +625,7 @@ export default function PitchDetails() {
                               {slot.time}
                             </div>
                             <div className="pitch-slot-price-text">
-                              {slot.status !== "available" ? "Booked" : slot.price}
+                              {slot.status === "booked" ? "Booked" : slot.status === "Locked" ? "locked" : formatVND(slot.price)}
                             </div>
                           </button>
                         );
@@ -657,7 +657,7 @@ export default function PitchDetails() {
                               {slot.time}
                             </div>
                             <div className="pitch-slot-price-text">
-                              {slot.status !== "available" ? "Booked" : slot.price}
+                              {slot.status === "booked" ? "Booked" : slot.status === "Locked" ? "locked" : formatVND(slot.price)}
                             </div>
                           </button>
                         );
@@ -687,7 +687,6 @@ export default function PitchDetails() {
                             disabled={slot.status !== "available"}
                             onClick={() => {
                               handleSlotToggle(slot._id, slot.status);
-                              console.log(totalPrice);
                             }}
                             className={`pitch-slot-button ${slot.status !== "available" ? "booked" : ""} ${isSelected ? "selected" : ""}`}
                           >
@@ -695,7 +694,7 @@ export default function PitchDetails() {
                               {slot.time}
                             </div>
                             <div className="pitch-slot-price-text">
-                              {slot.status !== "available" ? "Booked" : slot.price}
+                              {slot.status === "booked" ? "Booked" : slot.status === "Locked" ? "locked" : formatVND(slot.price)}
                             </div>
                           </button>
                         );
@@ -792,7 +791,7 @@ export default function PitchDetails() {
               <div className="pitch-total-block">
                 <div className="pitch-total-row">
                   <span className="pitch-total-label">Total Amount</span>
-                  <span className="pitch-total-amount">{totalPrice}</span>
+                  <span className="pitch-total-amount">{formatVND(totalPrice)}</span>
                 </div>
                 <div className="pitch-total-sub">
                   Includes pitch reservation, equipment and floodlight costs
