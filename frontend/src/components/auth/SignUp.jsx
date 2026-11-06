@@ -47,7 +47,7 @@ export default function signup() {
         password: password,
         password_confirm: confirmPassword
       })
-      navigate("/signin");
+      navigate("/signin", { state: { successMsg: "Account created successfully. Please sign in." } });
     } catch (err) {
       setErrorMsg(err.response?.data?.message || "create account failed")
     }
@@ -72,7 +72,7 @@ export default function signup() {
         </div>
 
         <div className="auth-card">
-          {errorMsg && <div className="signup-error-banner">{errorMsg}</div>}
+          {errorMsg && <div className="signup-error-banner" role="alert">{errorMsg}</div>}
           <form
             className="auth-form"
             onSubmit={handleCreateAccount}

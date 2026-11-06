@@ -43,7 +43,9 @@ export default function () {
         const pitchesRes = res.data;
         setPitches(pitchesRes.data);
       })
-      .catch((err) => setErrorMsg(err.response?.data?.message));
+      .catch((err) =>
+        setErrorMsg(err.response?.data?.message || "Không thể tải danh sách sân.")
+      );
   }, []);
 
 
@@ -230,6 +232,11 @@ export default function () {
             </div>
 
             {/* Populated Pitches Grid */}
+            {errorMsg && (
+              <div className="discovery-error-banner" role="alert">
+                {errorMsg}
+              </div>
+            )}
             <div className="discovery-cards-grid">
               {pitches.map((pitch) => (
                 <div

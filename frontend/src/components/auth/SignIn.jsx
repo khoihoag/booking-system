@@ -3,21 +3,24 @@ import { Link } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import PitchBookLogo from "../common/PitchBookLogo";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import axios from 'axios'
 
 export default function SignIn() {
   const { setCurrentUser } = useApp();
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState(location.state?.successMsg || "");
 
   const handleSignIn = async (e) => {
     e.preventDefault();
     setErrorMsg("");
+    setSuccessMsg("");
 
     if (!email || !password) {
       setErrorMsg("All fields are required.");
@@ -47,15 +50,17 @@ export default function SignIn() {
 
       setCurrentUser(user)
 
+      setSuccessMsg("Login successful. Redirecting...");
+
       const pendingBooking = JSON.parse(sessionStorage.getItem('booking'))
 
       if (pendingBooking) {
         console.log(pendingBooking)
-        navigate(`/pitch-detail/${pendingBooking.pitchId}`)
+        setTimeout(() => navigate(`/pitch-detail/${pendingBooking.pitchId}`), 800)
         return
       }
 
-      navigate("/");
+      setTimeout(() => navigate("/"), 800);
     } catch(err) {
       setErrorMsg(err.response?.data?.message || "DDD")
       console.log("err" + err)
@@ -81,7 +86,8 @@ export default function SignIn() {
         </div>
 
         <div className="auth-card">
-          {errorMsg && <div className="signin-error-banner">{errorMsg}</div>}
+          {errorMsg && <div className="signin-error-banner" role="alert">{errorMsg}</div>}
+          {successMsg && <div className="signin-success-banner" role="status">{successMsg}</div>}
           <form
             className="auth-form"
             onSubmit={handleSignIn}

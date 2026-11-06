@@ -40,6 +40,7 @@ export default function PitchDetails() {
   const [pitch, setPitch] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [hasLoadError, setHasLoadError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const [activeImage, setActiveImage] = useState();
   const [selectedSlotIds, setSelectedSlotIds] = useState([]);
   const [timeSlots, setTimeSlots] = useState([]);
@@ -85,6 +86,7 @@ export default function PitchDetails() {
   useEffect(() => {
     setIsLoading(true);
     setHasLoadError(false);
+    setErrorMsg("");
     setPitch(undefined);
     axios
       .get(`/api/pitch/${id}`)
@@ -100,6 +102,7 @@ export default function PitchDetails() {
       })
       .catch((err) => {
         console.log(err);
+        setErrorMsg(err.response?.data?.message || "Không thể tải thông tin sân.");
         setHasLoadError(true);
       })
       .finally(() => {
@@ -262,6 +265,7 @@ export default function PitchDetails() {
   // Nút tạm thời: Xác nhận thanh toán (Mô phỏng quy trình thanh toán thành công)
   const handleSimulatePayment = async () => {
     try {
+      setErrorMsg("");
       setIsProcessingPayment(true);
 
       const response = await api.post("/booking", {
@@ -272,6 +276,7 @@ export default function PitchDetails() {
       setModalStep("success");
     } catch (err) {
       setModalStep("failes");
+      setErrorMsg(err.response?.data?.message || "Không thể hoàn tất đặt sân.");
       console.log(err);
     } finally {
       setIsProcessingPayment(false);
@@ -328,8 +333,7 @@ export default function PitchDetails() {
               lineHeight: 1.5,
             }}
           >
-            Không thể lấy dữ liệu sân bóng từ máy chủ hoặc sân này không còn tồn
-            tại trên hệ thống.
+            {errorMsg || "Không thể lấy dữ liệu sân bóng từ máy chủ hoặc sân này không còn tồn tại trên hệ thống."}
           </p>
           <Link to="/discovery">
             <button className="pitch-fallback-btn">Quay lại tìm sân</button>
@@ -1255,6 +1259,12 @@ export default function PitchDetails() {
                   <AlertCircle style={{ width: 14, height: 14 }} />
                   <span>Nguyên nhân không thể hoàn tất:</span>
                 </div>
+
+                {errorMsg && (
+                  <p className="pitch-fail-backend-error" role="alert">
+                    {errorMsg}
+                  </p>
+                )}
 
                 {failReason === "slot_taken" && (
                   <p className="pitch-fail-reason-desc">
