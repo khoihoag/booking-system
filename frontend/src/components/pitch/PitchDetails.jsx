@@ -1,6 +1,6 @@
 import "./PitchDetails.css";
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import { formatDateVN, formatVND } from "../utils/Format";
 import api from "./../../services/api";
@@ -77,13 +77,13 @@ export default function PitchDetails() {
   // Quản lý Modal yêu cầu Đăng nhập & trạng thái Giả lập chưa đăng nhập (Test UI)
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  const [failReason, setFailReason] = useState('slot_taken');
-
+  const [failReason, setFailReason] = useState("slot_taken");
 
   useEffect(() => {
     axios
       .get(`/api/pitch/${id}`)
       .then((res) => {
+        setTimeout(2000)
         const pitchRes = res.data;
         setPitch(pitchRes.data);
         setActiveImage(pitchRes.data?.imageUrl);
@@ -97,6 +97,7 @@ export default function PitchDetails() {
         console.log(err);
       });
   }, [id]);
+
 
   const handleSlotToggle = (slotId, isBooked) => {
     if (isBooked) return;
@@ -261,7 +262,7 @@ export default function PitchDetails() {
       console.log(1);
       setModalStep("success");
     } catch (err) {
-      setModalStep("failes")
+      setModalStep("failes");
       console.log(err);
     } finally {
       setIsProcessingPayment(false);
@@ -294,7 +295,35 @@ export default function PitchDetails() {
   };
 
   if (!pitch) {
-    return <div className="loading">Đang tải thông tin sân bóng...</div>;
+    return (
+      <div className="pitch-fallback-screen">
+        <div className="pitch-fallback-card">
+          <AlertCircle
+            style={{
+              width: 44,
+              height: 44,
+              color: "#ef4444",
+              margin: "0 auto 1rem",
+            }}
+          />
+          <h2 className="pitch-fallback-title">Không tìm thấy thông tin sân</h2>
+          <p
+            style={{
+              color: "#6b7280",
+              fontSize: "0.875rem",
+              marginTop: "0.5rem",
+              lineHeight: 1.5,
+            }}
+          >
+            Không thể lấy dữ liệu sân bóng từ máy chủ hoặc sân này không còn tồn
+            tại trên hệ thống.
+          </p>
+          <Link to="/discovery">
+            <button className="pitch-fallback-btn">Quay lại tìm sân</button>
+          </Link>
+        </div>
+      </div>
+    );
   }
   return (
     <div className="pitch-details-page">
@@ -756,9 +785,11 @@ export default function PitchDetails() {
               <button
                 type="button"
                 onClick={handleConfirmBooking}
-                className={`pitch-confirm-btn ${selectedSlotIds.length > 0 ? 'active' : 'disabled'}`}
+                className={`pitch-confirm-btn ${selectedSlotIds.length > 0 ? "active" : "disabled"}`}
               >
-                {selectedSlotIds.length === 0 ? 'Chọn khung giờ để đặt' : `Xác nhận & Đặt sân`}
+                {selectedSlotIds.length === 0
+                  ? "Chọn khung giờ để đặt"
+                  : `Xác nhận & Đặt sân`}
               </button>
             </div>
           </div>
