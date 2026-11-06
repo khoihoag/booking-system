@@ -477,7 +477,7 @@ export default function PitchDetails() {
                   <div className="pitch-spec-value">{pitch.ownerName}</div>
                 </div> */}
                 <div>
-                  <div className="pitch-spec-label">Managed By (Owner ID)</div>
+                  <div className="pitch-spec-label">Managed By</div>
                   <div className="pitch-spec-value">
                     {typeof pitch.ownerId === "object"
                       ? pitch.ownerId?.name || pitch.ownerId?._id
@@ -756,9 +756,9 @@ export default function PitchDetails() {
               <button
                 type="button"
                 onClick={handleConfirmBooking}
-                className="pitch-confirm-btn active"
+                className={`pitch-confirm-btn ${selectedSlotIds.length > 0 ? 'active' : 'disabled'}`}
               >
-                Confirm & Reserve Pitch
+                {selectedSlotIds.length === 0 ? 'Chọn khung giờ để đặt' : `Xác nhận & Đặt sân`}
               </button>
             </div>
           </div>
