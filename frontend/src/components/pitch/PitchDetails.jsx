@@ -111,8 +111,8 @@ export default function PitchDetails() {
   }, [id]);
 
 
-  const handleSlotToggle = (slotId, isBooked) => {
-    if (isBooked) return;
+  const handleSlotToggle = (slotId, status) => {
+    if (status !== "available") return;
     setSelectedSlotIds((prev) =>
       prev.includes(slotId)
         ? prev.filter((item) => item !== slotId)
@@ -136,7 +136,7 @@ export default function PitchDetails() {
 
     // Lấy lại những ca đã chọn từ danh sách API
     const restoredSlotIds = timeSlots
-      .filter((slot) => pendingSlotIds.includes(slot._id) && !slot.isBooked)
+      .filter((slot) => pendingSlotIds.includes(slot._id) && slot.status === "available")
       .map((slot) => slot._id);
 
     setSelectedSlotIds(restoredSlotIds);
@@ -344,6 +344,7 @@ export default function PitchDetails() {
   }
   return (
     <div className="pitch-details-page">
+      {console.log(timeSlots)}
       {/* Breadcrumb Bar */}
       <div className="pitch-top-bar">
         <div className="pitch-top-bar-inner">
@@ -614,17 +615,17 @@ export default function PitchDetails() {
                           <button
                             key={slot._id}
                             type="button"
-                            disabled={slot.isBooked}
+                            disabled={slot.status !== "available"}
                             onClick={() => {
-                              handleSlotToggle(slot._id, slot.isBooked);
+                              handleSlotToggle(slot._id, slot.status);
                             }}
-                            className={`pitch-slot-button ${slot.isBooked ? "booked" : ""} ${isSelected ? "selected" : ""}`}
+                            className={`pitch-slot-button ${slot.status !== "available" ? "booked" : ""} ${isSelected ? "selected" : ""}`}
                           >
                             <div className="pitch-slot-time-text">
                               {slot.time}
                             </div>
                             <div className="pitch-slot-price-text">
-                              {slot.isBooked ? "Booked" : slot.price}
+                              {slot.status !== "available" ? "Booked" : slot.price}
                             </div>
                           </button>
                         );
@@ -646,17 +647,17 @@ export default function PitchDetails() {
                           <button
                             key={slot._id}
                             type="button"
-                            disabled={slot.isBooked}
+                            disabled={slot.status !== "available"}
                             onClick={() => {
-                              handleSlotToggle(slot._id, slot.isBooked);
+                              handleSlotToggle(slot._id, slot.status);
                             }}
-                            className={`pitch-slot-button ${slot.isBooked ? "booked" : ""} ${isSelected ? "selected" : ""}`}
+                            className={`pitch-slot-button ${slot.status !== "available" ? "booked" : ""} ${isSelected ? "selected" : ""}`}
                           >
                             <div className="pitch-slot-time-text">
                               {slot.time}
                             </div>
                             <div className="pitch-slot-price-text">
-                              {slot.isBooked ? "Booked" : slot.price}
+                              {slot.status !== "available" ? "Booked" : slot.price}
                             </div>
                           </button>
                         );
@@ -683,18 +684,18 @@ export default function PitchDetails() {
                           <button
                             key={slot._id}
                             type="button"
-                            disabled={slot.isBooked}
+                            disabled={slot.status !== "available"}
                             onClick={() => {
-                              handleSlotToggle(slot._id, slot.isBooked);
+                              handleSlotToggle(slot._id, slot.status);
                               console.log(totalPrice);
                             }}
-                            className={`pitch-slot-button ${slot.isBooked ? "booked" : ""} ${isSelected ? "selected" : ""}`}
+                            className={`pitch-slot-button ${slot.status !== "available" ? "booked" : ""} ${isSelected ? "selected" : ""}`}
                           >
                             <div className="pitch-slot-time-text">
                               {slot.time}
                             </div>
                             <div className="pitch-slot-price-text">
-                              {slot.isBooked ? "Booked" : slot.price}
+                              {slot.status !== "available" ? "Booked" : slot.price}
                             </div>
                           </button>
                         );

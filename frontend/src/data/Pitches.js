@@ -231,16 +231,16 @@ export const initialPitches = [
 
 export const generateTimeSlots = (dateString) => {
   return [
-    { time: '06:00 - 07:30', period: 'morning', priceMultiplier: 0.85, isBooked: false },
-    { time: '07:30 - 09:00', period: 'morning', priceMultiplier: 0.9, isBooked: true },
-    { time: '09:00 - 10:30', period: 'morning', priceMultiplier: 0.9, isBooked: false },
-    { time: '10:30 - 12:00', period: 'morning', priceMultiplier: 0.85, isBooked: false },
-    { time: '14:00 - 15:30', period: 'afternoon', priceMultiplier: 0.9, isBooked: false },
-    { time: '15:30 - 17:00', period: 'afternoon', priceMultiplier: 1.0, isBooked: false },
-    { time: '17:00 - 18:30', period: 'evening', priceMultiplier: 1.25, isBooked: true },
-    { time: '18:30 - 20:00', period: 'evening', priceMultiplier: 1.3, isBooked: true },
-    { time: '20:00 - 21:30', period: 'evening', priceMultiplier: 1.25, isBooked: false },
-    { time: '21:30 - 23:00', period: 'evening', priceMultiplier: 1.1, isBooked: false },
+    { time: '06:00 - 07:30', period: 'morning', priceMultiplier: 0.85, status: 'available' },
+    { time: '07:30 - 09:00', period: 'morning', priceMultiplier: 0.9, status: 'booked' },
+    { time: '09:00 - 10:30', period: 'morning', priceMultiplier: 0.9, status: 'available' },
+    { time: '10:30 - 12:00', period: 'morning', priceMultiplier: 0.85, status: 'available' },
+    { time: '14:00 - 15:30', period: 'afternoon', priceMultiplier: 0.9, status: 'available' },
+    { time: '15:30 - 17:00', period: 'afternoon', priceMultiplier: 1.0, status: 'available' },
+    { time: '17:00 - 18:30', period: 'evening', priceMultiplier: 1.25, status: 'booked' },
+    { time: '18:30 - 20:00', period: 'evening', priceMultiplier: 1.3, status: 'booked' },
+    { time: '20:00 - 21:30', period: 'evening', priceMultiplier: 1.25, status: 'available' },
+    { time: '21:30 - 23:00', period: 'evening', priceMultiplier: 1.1, status: 'available' },
   ];
 };
 
