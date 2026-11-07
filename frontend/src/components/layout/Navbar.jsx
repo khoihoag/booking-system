@@ -51,22 +51,38 @@ export default function () {
               Find a Pitch
             </Link> */}
             <NavLink to='/discovery' className={({isActive}) => isActive ? "navbar-link-btn active" : "navbar-link-btn"}>Find a Pitch</NavLink>
-            <Link to='/owner'
-              className="navbar-link-btn"
-            >
-              Owner Console
-            </Link>
-            <a
-              href="admin-dashboard.html"
-              className="navbar-link-btn"
-            >
-              Admin Console
-            </a>
-            <Link to='/dashboard'
-              className="navbar-link-btn"
-            >
-              Player Dashboard
-            </Link>
+            {
+              currentUser?.role === 'owner' && (
+              <Link to='/dashboard'
+                className="navbar-link-btn"
+              >
+                Owner Console
+              </Link>
+              )
+            }
+            {
+              currentUser?.role === 'user' && (
+              <Link to='/dashboard'
+                className="navbar-link-btn"
+              >
+                Player Dashboard
+              </Link>
+              )
+            }
+            {
+              currentUser?.role === 'admin' && (
+              <Link to='/dashboard'
+                className="navbar-link-btn"
+              >
+                Admin Console
+              </Link>
+              )
+            }
+            <Link to='/account'
+                className="navbar-link-btn"
+              >
+                My Account
+              </Link>
           </nav>
 
           <div className="nav-actions">

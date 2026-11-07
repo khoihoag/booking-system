@@ -13,6 +13,7 @@ import Discovery from './components/discovery/Discovery'
 import PitchDetails from './components/pitch/PitchDetails'
 import {AppProvider, useApp} from './context/AppContext'
 import PitchBookLogo from './components/common/PitchBookLogo'
+import AccountPage from './components/account/AccountPage'
 
 const AppContent = () => {
     return (
@@ -27,6 +28,7 @@ const AppContent = () => {
                 <Route path="/dashboard" element={<UserDashboard />} />
                 <Route path="/owner" element={<OwnerDashboard />} />
                 <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/account" element={<AccountPage />} />
             </Routes>
             <Footer />
         </BrowserRouter >
