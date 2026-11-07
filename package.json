@@ -1,0 +1,12 @@
+{
+  "name": "booking-system",
+  "private": true,
+  "scripts": {
+    "install:all": "npm ci --prefix backend && npm ci --prefix frontend",
+    "dev": "bash scripts/run.sh dev",
+    "start": "bash scripts/run.sh start",
+    "build": "npm run build --prefix frontend",
+    "test": "npm test --prefix backend",
+    "lint": "npm run lint --prefix frontend"
+  }
+}
