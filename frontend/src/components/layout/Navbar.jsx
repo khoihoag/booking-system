@@ -50,6 +50,9 @@ export default function () {
             >
               Find a Pitch
             </Link> */}
+            <Link to='/#HowItWork' className="navbar-link-btn">
+              How It Works
+            </Link>
             <NavLink to='/discovery' className={({isActive}) => isActive ? "navbar-link-btn active" : "navbar-link-btn"}>Find a Pitch</NavLink>
             {
               currentUser?.role === 'owner' && (
