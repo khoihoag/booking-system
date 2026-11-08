@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import api from '../../services/api';
 import { 
   User, Shield, Bell, Award, Check, ChevronRight, 
   Key, Smartphone, Laptop, Calendar, Phone, Mail, 
@@ -54,34 +55,42 @@ const AccountPage = () => {
   }, [currentUser]);
 
   // Handler: Lưu thông tin cá nhân
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
     if (!currentUser) return;
 
-    setCurrentUser({
-      ...currentUser,
+    const response = await api.patch('/user/updateData', {
       name,
       email,
       phone,
       city,
       bio,
+    }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
+    const updatedUser = response.data.data.user;
+    setCurrentUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
 
     addToast('success', 'Đã lưu hồ sơ cá nhân!', 'Thông tin cá nhân của bạn đã được cập nhật thành công.');
   };
 
   // Handler: Lưu tùy chọn thi đấu bóng đá
-  const handleSaveFootballPrefs = (e) => {
+  const handleSaveFootballPrefs = async (e) => {
     e.preventDefault();
     if (!currentUser) return;
 
-    setCurrentUser({
-      ...currentUser,
+    const response = await api.patch('/user/updateData', {
       preferredType,
       position,
       preferredFoot,
       jerseyNumber: Number(jerseyNumber) || 10,
+    }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
+    const updatedUser = response.data.data.user;
+    setCurrentUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
 
     addToast('success', 'Đã lưu sở thích thi đấu!', 'Thông tin vị trí và loại sân sở trường đã được cập nhật.');
   };
