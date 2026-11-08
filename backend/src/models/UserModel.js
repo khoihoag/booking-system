@@ -37,6 +37,33 @@ const UserSchema = new mongoose.Schema({
         enum: ['user', 'admin', 'pitch_owner'],
         default: 'user'
     },
+    phone: String,
+    city: String,
+    bio: String,
+    preferredType: String,
+    position: String,
+    preferredFoot: String,
+    jerseyNumber: {
+        type: Number,
+        min: 1,
+        max: 99,
+    },
+    twoFactorEnabled: {
+        type: Boolean,
+        default: true,
+    },
+    smsReminder: {
+        type: Boolean,
+        default: true,
+    },
+    zaloNotification: {
+        type: Boolean,
+        default: true,
+    },
+    promoAlerts: {
+        type: Boolean,
+        default: false,
+    },
     passwordChangeAt: Date,
     passwordResetToken: String,
     passwordResetExpries: Date,

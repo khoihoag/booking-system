@@ -10,7 +10,7 @@ const filterObj = (obj, ...allowedFields) => {
 }
 
 exports.createUser = async (body) => {
-    const filteredBody = filterObj(body, 'name', 'email', 'password', 'password_confirm', 'role')
+    const filteredBody = filterObj(body, 'name', 'email', 'password', 'password_confirm', 'role', 'phone', 'city', 'bio', 'preferredType', 'position', 'preferredFoot', 'jerseyNumber', 'twoFactorEnabled', 'smsReminder', 'zaloNotification', 'promoAlerts')
     return userRepository.create(filteredBody)
 }
 
@@ -27,7 +27,7 @@ exports.updateUser = async (userId, body) => {
         throw new AppError('Can not update password', 400)
     }
 
-    const filteredBody = filterObj(body, 'name', 'email', 'role')
+    const filteredBody = filterObj(body, 'name', 'email', 'role', 'phone', 'city', 'bio', 'preferredType', 'position', 'preferredFoot', 'jerseyNumber', 'twoFactorEnabled', 'smsReminder', 'zaloNotification', 'promoAlerts')
     const updatedUser = await userRepository.update(userId, filteredBody)
 
     if (!updatedUser) {
@@ -47,7 +47,7 @@ exports.updateData = async (userId, body) => {
         throw new AppError('This route is not for password updates. Please use /updatePassword', 400)
     }
 
-    const filteredBody = filterObj(body, 'name', 'email')
+    const filteredBody = filterObj(body, 'name', 'email', 'phone', 'city', 'bio', 'preferredType', 'position', 'preferredFoot', 'jerseyNumber', 'twoFactorEnabled', 'smsReminder', 'zaloNotification', 'promoAlerts')
     const updatedUser = await userRepository.update(userId, filteredBody)
 
     if (!updatedUser) {
