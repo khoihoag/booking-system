@@ -34,8 +34,8 @@ export default function () {
   const handleSignOut = () => {
     setUserDropdownOpen(false);
     setCurrentUser(null);
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
   };
 
   return (
@@ -50,42 +50,60 @@ export default function () {
             >
               Find a Pitch
             </Link> */}
-            <Link to='/#HowItWork' className="navbar-link-btn">
+            <NavLink
+              to="/#HowItWork"
+              className={({ isActive }) =>
+                isActive ? "navbar-link-btn active" : "navbar-link-btn"
+              }
+            >
               How It Works
-            </Link>
-            <NavLink to='/discovery' className={({isActive}) => isActive ? "navbar-link-btn active" : "navbar-link-btn"}>Find a Pitch</NavLink>
-            {
-              currentUser?.role === 'owner' && (
-              <Link to='/dashboard'
-                className="navbar-link-btn"
+            </NavLink>
+            <NavLink
+              to="/discovery"
+              className={({ isActive }) =>
+                isActive ? "navbar-link-btn active" : "navbar-link-btn"
+              }
+            >
+              Find a Pitch
+            </NavLink>
+            {currentUser?.role === "owner" && (
+              <NavLink
+                to="/owner"
+                className={({ isActive }) =>
+                  isActive ? "navbar-link-btn active" : "navbar-link-btn"
+                }
               >
                 Owner Console
-              </Link>
-              )
-            }
-            {
-              currentUser?.role === 'user' && (
-              <Link to='/dashboard'
-                className="navbar-link-btn"
+              </NavLink>
+            )}
+            {currentUser?.role === "user" && (
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  isActive ? "navbar-link-btn active" : "navbar-link-btn"
+                }
               >
                 Player Dashboard
-              </Link>
-              )
-            }
-            {
-              currentUser?.role === 'admin' && (
-              <Link to='/dashboard'
-                className="navbar-link-btn"
+              </NavLink>
+            )}
+            {currentUser?.role === "admin" && (
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  isActive ? "navbar-link-btn active" : "navbar-link-btn"
+                }
               >
                 Admin Console
-              </Link>
-              )
-            }
-            <Link to='/account'
-                className="navbar-link-btn"
-              >
-                My Account
-              </Link>
+              </NavLink>
+            )}
+            <NavLink
+              to="/account"
+              className={({ isActive }) =>
+                isActive ? "navbar-link-btn active" : "navbar-link-btn"
+              }
+            >
+              My Account
+            </NavLink>
           </nav>
 
           <div className="nav-actions">
@@ -197,26 +215,23 @@ export default function () {
                           className="dropdown-signout-btn"
                         >
                           <LogOut size={16} />
-                          
-                            <span>Sign Out</span>
-             
+
+                          <span>Sign Out</span>
                         </button>
                       </div>
                     </div>
                   )}
                 </div>
               ) : (
-                <Link to='/signin'>
-                <button
-                onClick={() => handleNavClick('signin')}
-                className="signin-btn">
+                <Link to="/signin">
+                  <button
+                    onClick={() => handleNavClick("signin")}
+                    className="signin-btn"
+                  >
                     Sign in
-              </button>
+                  </button>
                 </Link>
-              
-              
-               
-            )}
+              )}
             </span>
             <Link to="/discovery">
               <button className="btn-primary">Book a Pitch</button>
