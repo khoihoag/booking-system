@@ -10,7 +10,7 @@ import './AccountPage.css';
 const tabs = ['profile', 'football', 'security', 'notifications'];
 
 const AccountPage = () => {
-  const { currentUser, setCurrentUser, setCurrentPage, addToast } = useApp();
+  const { currentUser, setCurrentUser, addToast } = useApp();
 
   const [activeTab, setActiveTab] = useState(tabs[0]);
 

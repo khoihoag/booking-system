@@ -14,11 +14,13 @@ import PitchDetails from './components/pitch/PitchDetails'
 import {AppProvider, useApp} from './context/AppContext'
 import PitchBookLogo from './components/common/PitchBookLogo'
 import AccountPage from './components/account/AccountPage'
+import { ToastContainer } from './components/common/ToastContainer'
 
 const AppContent = () => {
     return (
         <BrowserRouter>
             <Navbar />
+            <ToastContainer />
             <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/discovery" element={<Discovery />} />
