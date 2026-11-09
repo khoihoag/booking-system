@@ -24,14 +24,14 @@ exports.findUserById = async (id) => {
 
 exports.updateUser = async (userId, body) => {
     if (body.password || body.password_confirm) {
-        throw new AppError('Can not update password', 400)
+        throw new AppError('Không thể đổi mật khẩu ở chức năng cập nhật thông tin.', 400)
     }
 
     const filteredBody = filterObj(body, 'name', 'email', 'role', 'phone', 'city', 'bio', 'preferredType', 'position', 'preferredFoot', 'jerseyNumber', 'twoFactorEnabled', 'smsReminder', 'zaloNotification', 'promoAlerts')
     const updatedUser = await userRepository.update(userId, filteredBody)
 
     if (!updatedUser) {
-        throw new AppError('No user found with that ID', 404)
+        throw new AppError('Không tìm thấy tài khoản.', 404)
     }
 
     return updatedUser
@@ -44,14 +44,14 @@ exports.deleteUser = async (id) => {
 
 exports.updateData = async (userId, body) => {
     if (body.password || body.password_confirm) {
-        throw new AppError('This route is not for password updates. Please use /updatePassword', 400)
+        throw new AppError('Vui lòng dùng chức năng đổi mật khẩu riêng.', 400)
     }
 
     const filteredBody = filterObj(body, 'name', 'email', 'phone', 'city', 'bio', 'preferredType', 'position', 'preferredFoot', 'jerseyNumber', 'twoFactorEnabled', 'smsReminder', 'zaloNotification', 'promoAlerts')
     const updatedUser = await userRepository.update(userId, filteredBody)
 
     if (!updatedUser) {
-        throw new AppError('No user found with that ID', 404)
+        throw new AppError('Không tìm thấy tài khoản.', 404)
     }
 
     return updatedUser

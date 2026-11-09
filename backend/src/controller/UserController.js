@@ -24,7 +24,7 @@ exports.getUserById = catchAsync(async (req, res, next) => {
     const user = await userServices.findUserById(req.params._id)
 
     if (!user) {
-        return next(new AppError('No user found with that ID', 404))
+        return next(new AppError('Không tìm thấy tài khoản.', 404))
     }
 
     res.status(200).json({
@@ -37,7 +37,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     const user = await userServices.updateUser(req.params._id, req.body)
 
     if (!user) {
-        return next(new AppError('No user found with that ID', 404))
+        return next(new AppError('Không tìm thấy tài khoản.', 404))
     }
 
     res.status(200).json({
@@ -50,7 +50,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     const user = await userServices.deleteUser(req.params._id)
 
     if (!user) {
-        return next(new AppError('No user found with that ID', 404))
+        return next(new AppError('Không tìm thấy tài khoản.', 404))
     }
 
     res.status(204).send()
@@ -63,7 +63,7 @@ exports.updateData = catchAsync(async (req, res, next) => {
     const updatedUser = await userServices.updateData(req.user._id, req.body)
 
     if (!updatedUser) {
-        return next(new AppError('No user found with that ID', 404))
+        return next(new AppError('Không tìm thấy tài khoản.', 404))
     }
 
     res.status(200).json({
@@ -78,7 +78,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     const deleteMe = await userServices.deleteUser(req.user._id)
 
     if (!deleteMe) {
-        return next(new AppError('No user found with that ID', 404))
+        return next(new AppError('Không tìm thấy tài khoản.', 404))
     }
     res.status(204).send()
 })

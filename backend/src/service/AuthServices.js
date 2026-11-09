@@ -27,13 +27,13 @@ exports.signup = async (userData) => {
 
 exports.login = async (email, password) => {
     if (!email || !password) {
-        throw new AppError('Please provide email and password', 400)
+        throw new AppError('Vui lòng nhập email và mật khẩu.', 400)
     }
 
     const user = await userRepository.findByEmail(email, true)
     
     if (!user || !(await user.correctPassword(password, user.password))) {
-        throw new AppError('Incorrect email or password', 401)
+        throw new AppError('Email hoặc mật khẩu không chính xác.', 401)
     }
 
     // Hide password before returning
@@ -45,18 +45,18 @@ exports.login = async (email, password) => {
 
 exports.protect = async (token) => {
     if (!token) {
-        throw new AppError('You are not logged in! Please log in to get access.', 401)
+        throw new AppError('Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.', 401)
     }
 
     const decoded = await util.promisify(jwt.verify)(token, process.env.JWT_SECRET)
 
     const currentUser = await userRepository.findById(decoded.id)
     if (!currentUser) {
-        throw new AppError('The user belonging to this token no longer exists.', 401)
+        throw new AppError('Tài khoản không còn tồn tại. Vui lòng đăng nhập lại.', 401)
     }
 
     if (currentUser.changedPassword(decoded.iat)) {
-        throw new AppError('User recently changed password! Please log in again.', 401)
+        throw new AppError('Mật khẩu vừa được thay đổi. Vui lòng đăng nhập lại.', 401)
     }
 
     return currentUser
@@ -64,12 +64,12 @@ exports.protect = async (token) => {
 
 exports.forgotPassword = async (email, protocol, host) => {
     if (!email) {
-        throw new AppError('Please provide an email address', 400)
+        throw new AppError('Vui lòng nhập địa chỉ email.', 400)
     }
 
     const user = await userRepository.findByEmail(email)
     if (!user) {
-        throw new AppError('There is no user with that email address.', 404)
+        throw new AppError('Không tìm thấy tài khoản với email này.', 404)
     }
 
     const resetToken = user.createResetPasswordToken()
@@ -89,7 +89,7 @@ exports.forgotPassword = async (email, protocol, host) => {
         user.passwordResetExpries = undefined
         await userRepository.saveUser(user, { validateBeforeSave: false })
 
-        throw new AppError('There was an error sending the email. Try again later!', 500)
+        throw new AppError('Không thể gửi email. Vui lòng thử lại sau.', 500)
     }
 
     return resetToken
@@ -100,7 +100,7 @@ exports.resetPassword = async (token, password, password_confirm) => {
 
     const user = await userRepository.findByResetToken(hashedToken)
     if (!user) {
-        throw new AppError('Token is invalid or has expired', 400)
+        throw new AppError('Mã xác thực không hợp lệ hoặc đã hết hạn.', 400)
     }
 
     user.password = password
@@ -117,11 +117,11 @@ exports.resetPassword = async (token, password, password_confirm) => {
 exports.updatePassword = async (userId, passwordCurrent, password, password_confirm) => {
     const user = await userRepository.findById(userId, true)
     if (!user) {
-        throw new AppError('User not found', 404)
+        throw new AppError('Không tìm thấy tài khoản.', 404)
     }
 
     if (!(await user.correctPassword(passwordCurrent, user.password))) {
-        throw new AppError('Your current password is wrong', 401)
+        throw new AppError('Mật khẩu hiện tại không chính xác.', 401)
     }
 
     user.password = password

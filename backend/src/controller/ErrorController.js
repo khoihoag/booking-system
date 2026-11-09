@@ -23,13 +23,23 @@ const sendErrorProd = (err, res) => {
     }
 }
 
-const handleJWTError = err => new AppError('Invalid token. Place log in again.')
+const handleJWTError = () => new AppError('Token không hợp lệ. Vui lòng đăng nhập lại.', 401)
+
+const handleJWTExpiredError = () => new AppError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 401)
+const handleValidationError = err => new AppError(
+    Object.values(err.errors).map(error => error.message).join(' '),
+    400,
+)
+const handleDuplicateFieldsError = () => new AppError('Email đã được sử dụng.', 400)
 
 module.exports = (err, req, res, next) => {
     if (process.env.NODE_ENV === 'development') {
         sendErrorDev(err, res)
-    } else if (process.env.NODE_ENV === 'production') {
-        if (err.name  === 'JsonWebTokenError') err = handleJWTError(err)
+    } else {
+        if (err.name === 'JsonWebTokenError') err = handleJWTError(err)
+        if (err.name === 'TokenExpiredError') err = handleJWTExpiredError()
+        if (err.name === 'ValidationError') err = handleValidationError(err)
+        if (err.code === 11000) err = handleDuplicateFieldsError(err)
         sendErrorProd(err, res)
     }
 }
