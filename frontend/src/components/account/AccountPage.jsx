@@ -32,21 +32,23 @@ const AccountPage = () => {
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
   // Form states - Profile
-  const [name, setName] = useState(currentUser?.name);
-  const [email, setEmail] = useState(currentUser?.email);
-  const [phone, setPhone] = useState(currentUser?.phone);
-  const [city, setCity] = useState(currentUser?.city);
-  const [bio, setBio] = useState(currentUser?.bio);
+  const [name, setName] = useState(currentUser?.name ?? "");
+  const [email, setEmail] = useState(currentUser?.email ?? "");
+  const [phone, setPhone] = useState(currentUser?.phone ?? "");
+  const [city, setCity] = useState(currentUser?.city ?? "");
+  const [bio, setBio] = useState(currentUser?.bio ?? "");
 
   // Form states - Football Preferences
   const [preferredType, setPreferredType] = useState(
-    currentUser?.preferredType,
+    currentUser?.preferredType ?? "",
   );
-  const [position, setPosition] = useState(currentUser?.position);
+  const [position, setPosition] = useState(currentUser?.position ?? "");
   const [preferredFoot, setPreferredFoot] = useState(
-    currentUser?.preferredFoot,
+    currentUser?.preferredFoot ?? "",
   );
-  const [jerseyNumber, setJerseyNumber] = useState(currentUser?.jerseyNumber);
+  const [jerseyNumber, setJerseyNumber] = useState(
+    currentUser?.jerseyNumber ?? "",
+  );
 
   // Form states - Security
   const [currentPassword, setCurrentPassword] = useState("");
@@ -62,20 +64,31 @@ const AccountPage = () => {
   const [showAuthModal, setShowAuthModal] = useState(() => !currentUser);
   // Sync if currentUser updates
   useEffect(() => {
+    setShowAuthModal(!currentUser);
+
     if (currentUser) {
-      setName(currentUser.name);
-      setEmail(currentUser.email);
-      if (currentUser.phone) setPhone(currentUser.phone);
-      if (currentUser.city) setCity(currentUser.city);
-      if (currentUser.preferredType)
-        setPreferredType(currentUser.preferredType);
-      if (currentUser.position) setPosition(currentUser.position);
-      if (currentUser.preferredFoot)
-        setPreferredFoot(currentUser.preferredFoot);
-      if (currentUser.jerseyNumber) setJerseyNumber(currentUser.jerseyNumber);
-      if (currentUser.bio) setBio(currentUser.bio);
+      setName(currentUser.name ?? "");
+      setEmail(currentUser.email ?? "");
+      setPhone(currentUser.phone ?? "");
+      setCity(currentUser.city ?? "");
+      setPreferredType(currentUser.preferredType ?? "");
+      setPosition(currentUser.position ?? "");
+      setPreferredFoot(currentUser.preferredFoot ?? "");
+      setJerseyNumber(currentUser.jerseyNumber ?? "");
+      setBio(currentUser.bio ?? "");
+    } else {
+      setName("");
+      setEmail("");
+      setPhone("");
+      setCity("");
+      setBio("");
+      setPreferredType("");
+      setPosition("");
+      setPreferredFoot("");
+      setJerseyNumber("");
     }
-  if (sessionStorage.getItem('accountPage')) sessionStorage.removeItem('accountPage')
+    if (sessionStorage.getItem("accountPage"))
+      sessionStorage.removeItem("accountPage");
   }, [currentUser]);
 
   // Handler: Lưu thông tin cá nhân
@@ -136,7 +149,7 @@ const AccountPage = () => {
   };
 
   // Handler: Đổi mật khẩu
-  const handleUpdatePassword = (e) => {
+  const handleUpdatePassword = async (e) => {
     e.preventDefault();
     if (!currentPassword) {
       addToast(
@@ -163,14 +176,39 @@ const AccountPage = () => {
       return;
     }
 
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    addToast(
-      "success",
-      "Đổi mật khẩu thành công!",
-      "Mật khẩu tài khoản của bạn đã được cập nhật an toàn.",
-    );
+    try {
+      const response = await api.patch(
+        "/user/updatePassword",
+        {
+          passwordCurrent: currentPassword,
+          password: newPassword,
+          password_confirm: confirmPassword,
+        },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        },
+      );
+
+      const updatedUser = response.data.user;
+      setCurrentUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      localStorage.setItem("token", response.data.token);
+  
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      addToast(
+        "success",
+        "Đổi mật khẩu thành công!",
+        "Mật khẩu tài khoản của bạn đã được cập nhật an toàn.",
+      );
+    } catch (error) {
+      addToast(
+        "error",
+        "Đổi mật khẩu thất bại",
+        error.response?.data?.message || "Không thể đổi mật khẩu.",
+      );
+    }
   };
 
   const goAuth = (page) => {
@@ -597,7 +635,7 @@ const AccountPage = () => {
                     <label className="account-field-label">Mật khẩu mới</label>
                     <input
                       type="password"
-                      placeholder="Ít nhất 6 ký tự"
+                      placeholder="Ít nhất 8 ký tự"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       className="account-input"
