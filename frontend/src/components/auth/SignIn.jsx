@@ -53,14 +53,17 @@ export default function SignIn() {
       setSuccessMsg("Login successful. Redirecting...");
 
       const pendingBooking = JSON.parse(sessionStorage.getItem('booking'))
-
+      const accountPage = sessionStorage.getItem('accountPage')
+      console.log(accountPage)
       if (pendingBooking) {
-        console.log(pendingBooking)
-        setTimeout(() => navigate(`/pitch-detail/${pendingBooking.pitchId}`), 800)
+        navigate(`/pitch-detail/${pendingBooking.pitchId}`)
+        return
+      } else if (accountPage) {
+        navigate('/account')
         return
       }
 
-      setTimeout(() => navigate("/"), 800);
+      navigate("/")
     } catch(err) {
       setErrorMsg(err.response?.data?.message || "DDD")
       console.log("err" + err)
