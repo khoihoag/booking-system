@@ -271,6 +271,7 @@ export default function PitchDetails() {
 
       const response = await api.post("/booking", {
         timeSlotId: selectedSlotIds,
+        date: selectedDate,
       });
 
       console.log(1);

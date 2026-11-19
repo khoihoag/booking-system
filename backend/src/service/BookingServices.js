@@ -4,7 +4,11 @@ const AppError = require('../utils/AppError')
 
 exports.createBooking = async (data) => {
     
-    const { timeSlotId, userId } = data;
+    const { timeSlotId, userId, date } = data;
+
+    if (!date) {
+        throw new AppError('Please provide a booking date', 400);
+    }
 
     const isMultiple = Array.isArray(timeSlotId);
     const timeSlotIds = isMultiple ? timeSlotId : [timeSlotId];

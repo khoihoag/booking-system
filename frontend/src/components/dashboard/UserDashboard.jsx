@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { initialBookings } from '../../data/Pitches';
 import { formatVND } from '../utils/Format';
+import api from '../../services/api';
 import { 
   CalendarCheck, Clock, MapPin, XCircle, Eye, 
   Trophy, Plus, CheckCircle2, Flame, Activity, 
@@ -18,11 +18,32 @@ export default () => {
   const { currentUser, setCurrentPage, addToast } = useApp();
 
   const [activeTab, setActiveTab] = useState('upcoming');
-  const [bookings, setBookings] = useState(initialBookings);
+  const [bookings, setBookings] = useState([]);
   const [historyFilter, setHistoryFilter] = useState('all');
   const [selectedBookingForDetails, setSelectedBookingForDetails] = useState(null);
   const [bookingToCancel, setBookingToCancel] = useState(null);
   const [copiedCode, setCopiedCode] = useState(false);
+
+  useEffect(() => {
+    api.get('/booking/my-bookings')
+      .then(({ data }) => setBookings(data.data.map((booking) => {
+        const slots = Array.isArray(booking.timeSlotId) ? booking.timeSlotId : [booking.timeSlotId];
+        const pitch = slots[0]?.pitchId || {};
+        return {
+          ...booking,
+          id: booking._id,
+          pitchName: pitch.name || 'Sân bóng',
+          pitchType: pitch.pitchType || '7-a-side',
+          location: pitch.address || 'Chưa cập nhật',
+          date: booking.date || (booking.created_at ? new Date(booking.created_at).toISOString().slice(0, 10) : 'Chưa cập nhật'),
+          timeSlots: slots.map((slot) => slot.time).filter(Boolean),
+          durationHours: slots.length * 1.5,
+          totalPrice: slots.reduce((total, slot) => total + (slot.price || 0), 0),
+          paymentMethod: 'Thanh toán trực tuyến',
+        };
+      })))
+      .catch(() => addToast('error', 'Không thể tải dữ liệu', 'Vui lòng thử lại sau.'));
+  }, []);
 
   // Phân loại trận đấu
   const upcomingBookings = bookings.filter(b => b.status === 'confirmed');
@@ -50,9 +71,28 @@ export default () => {
     setBookings(prev => 
       prev.map(b => b.id === bookingToCancel.id ? { ...b, status: 'cancelled' } : b)
     );
+    api.delete(`/booking/${bookingToCancel.id}`);
     addToast('info', 'Đã hủy lịch thi đấu', `Trận đấu #${bookingToCancel.id} tại ${bookingToCancel.pitchName} đã được hủy.`);
     setBookingToCancel(null);
   };
+
+  const pitchStats = useMemo(() => {
+    const counts = bookings.reduce((result, booking) => {
+      result[booking.pitchType] = (result[booking.pitchType] || 0) + 1;
+      return result;
+    }, {});
+    const total = bookings.length || 1;
+    return Object.entries(counts).map(([type, count]) => ({ type, count, percent: Math.round(count / total * 100) }));
+  }, [bookings]);
+  const timeStats = useMemo(() => {
+    const counts = bookings.flatMap(({ timeSlots }) => timeSlots).reduce((result, time) => {
+      result[time] = (result[time] || 0) + 1;
+      return result;
+    }, {});
+    const total = Object.values(counts).reduce((sum, count) => sum + count, 0) || 1;
+    return Object.entries(counts).sort(([, a], [, b]) => b - a).slice(0, 3)
+      .map(([time, count]) => ({ time, percent: Math.round(count / total * 100) }));
+  }, [bookings]);
 
   // Sao chép mã đặt sân
   const handleCopyBookingCode = (code) => {
@@ -458,35 +498,12 @@ export default () => {
                 </div>
 
                 <div className="user-analytics-list">
-                  <div className="user-bar-item">
-                    <div className="user-bar-label-row">
-                      <span>Sân 7 người (Mini Stadium)</span>
-                      <span>65% (8 trận)</span>
+                  {pitchStats.length === 0 ? <span>Chưa có dữ liệu</span> : pitchStats.map(({ type, count, percent }) => (
+                    <div className="user-bar-item" key={type}>
+                      <div className="user-bar-label-row"><span>{type}</span><span>{percent}% ({count} trận)</span></div>
+                      <div className="user-bar-track"><div className="user-bar-fill user-bar-fill-neon" style={{ width: `${percent}%` }} /></div>
                     </div>
-                    <div className="user-bar-track">
-                      <div className="user-bar-fill user-bar-fill-neon" style={{ width: '65%' }}></div>
-                    </div>
-                  </div>
-
-                  <div className="user-bar-item">
-                    <div className="user-bar-label-row">
-                      <span>Sân 5 người (Futsal / Mini)</span>
-                      <span>25% (3 trận)</span>
-                    </div>
-                    <div className="user-bar-track">
-                      <div className="user-bar-fill user-bar-fill-blue" style={{ width: '25%' }}></div>
-                    </div>
-                  </div>
-
-                  <div className="user-bar-item">
-                    <div className="user-bar-label-row">
-                      <span>Sân 11 người tiêu chuẩn</span>
-                      <span>10% (1 trận)</span>
-                    </div>
-                    <div className="user-bar-track">
-                      <div className="user-bar-fill" style={{ width: '10%', backgroundColor: '#6366f1' }}></div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
 
@@ -501,35 +518,12 @@ export default () => {
                 </div>
 
                 <div className="user-analytics-list">
-                  <div className="user-bar-item">
-                    <div className="user-bar-label-row">
-                      <span>18:30 - 20:30 (Khung giờ vàng sau giờ làm)</span>
-                      <span>75%</span>
+                  {timeStats.length === 0 ? <span>Chưa có dữ liệu</span> : timeStats.map(({ time, percent }) => (
+                    <div className="user-bar-item" key={time}>
+                      <div className="user-bar-label-row"><span>{time}</span><span>{percent}%</span></div>
+                      <div className="user-bar-track"><div className="user-bar-fill user-bar-fill-neon" style={{ width: `${percent}%` }} /></div>
                     </div>
-                    <div className="user-bar-track">
-                      <div className="user-bar-fill user-bar-fill-neon" style={{ width: '75%' }}></div>
-                    </div>
-                  </div>
-
-                  <div className="user-bar-item">
-                    <div className="user-bar-label-row">
-                      <span>17:00 - 18:30 (Hoàng hôn)</span>
-                      <span>15%</span>
-                    </div>
-                    <div className="user-bar-track">
-                      <div className="user-bar-fill user-bar-fill-blue" style={{ width: '15%' }}></div>
-                    </div>
-                  </div>
-
-                  <div className="user-bar-item">
-                    <div className="user-bar-label-row">
-                      <span>06:30 - 08:30 (Bình minh sáng sớm)</span>
-                      <span>10%</span>
-                    </div>
-                    <div className="user-bar-track">
-                      <div className="user-bar-fill" style={{ width: '10%', backgroundColor: '#ec4899' }}></div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
