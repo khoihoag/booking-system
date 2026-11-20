@@ -14,12 +14,11 @@ exports.findTimeSlotById = async (id) => {
 }
 
 exports.findPitchTimeSlotsByDate = async (pitchId, date) => {
-    console.log(2)
     const timeSlots = await timeSlotRepository.findByPitchId(pitchId)
-    const bookedSlotIds = await bookingServices.findBookingsByDateNpitchId(date, pitchId)
-    console.log(timeSlots, bookedSlotIds)
-    
-    const bookedSet = new Set(bookedSlotIds)
+    const bookings = await bookingServices.findBookingsByDateNpitchId(date, pitchId)
+    const bookedSet = new Set(bookings.flatMap(booking =>
+        booking.timeSlotId.map(slot => String(slot._id || slot))
+    ))
 
     return timeSlots.map(slot => ({
         ...slot,

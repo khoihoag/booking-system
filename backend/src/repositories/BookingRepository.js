@@ -41,10 +41,9 @@ exports.findByUser = async (userId) => {
 }
 
 exports.findByPitchIdNDate = async (pitchId, date) => {
-    console.log(4)
     return Booking.find({
-        pitchId: pitchId,
-        date: date
+        date,
+        status: { $ne: 'cancelled' }
     }) .populate({
             path: 'timeSlotId',
             populate: { path: 'pitchId' }
@@ -53,6 +52,9 @@ exports.findByPitchIdNDate = async (pitchId, date) => {
             path: 'userId',
             select: 'name email'
         })
+        .then(bookings => bookings.filter(booking =>
+            booking.timeSlotId.some(slot => String(slot.pitchId?._id || slot.pitchId) === String(pitchId))
+        ))
 }
 ``
 

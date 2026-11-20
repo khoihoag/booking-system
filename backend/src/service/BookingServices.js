@@ -30,10 +30,11 @@ exports.createBooking = async (data) => {
         throw new AppError(isMultiple ? 'One or more time slots were not found' : 'No time slot found with that ID', 404);
     }
 
-    // Kiểm tra trạng thái của tất cả slots
-    const unavailableSlot = timeSlots.find(
-        slot => slot.status !== 'available'
-    );
+    const bookedSlots = await exports.findBookingsByDateNpitchId(date, timeSlots[0].pitchId);
+    const bookedSlotIds = new Set(bookedSlots.flatMap(booking =>
+        booking.timeSlotId.map(slot => String(slot._id || slot))
+    ));
+    const unavailableSlot = timeSlots.find(slot => bookedSlotIds.has(String(slot._id)));
 
     if (unavailableSlot) {
         throw new AppError(
@@ -42,17 +43,11 @@ exports.createBooking = async (data) => {
         );
     }
 
-    // Cập nhật trạng thái tất cả slots thành booked
-    if (isMultiple) {
-        await timeSlotRepository.updateMany(timeSlotIds, { status: 'booked' });
-    } else {
-        await timeSlotRepository.update(timeSlotId, { status: 'booked' });
-    }
-
     // Tạo booking
     const booking = await bookingRepository.create({
         timeSlotId,
         userId,
+        date,
         status: 'confirmed'
     });
 
@@ -81,17 +76,6 @@ exports.updateBooking = async (id, data) => {
         return null
     }
 
-    // Nếu hủy booking thì chuyển status của timeSlot về 'available'
-    if (data.status === 'cancelled' && booking.status !== 'cancelled') {
-        const slotIds = Array.isArray(booking.timeSlotId)
-            ? booking.timeSlotId
-            : [booking.timeSlotId]
-        for (const slot of slotIds) {
-            const slotId = slot?._id || slot
-            if (slotId) await timeSlotRepository.update(slotId, { status: 'available' })
-        }
-    }
-
     return bookingRepository.update(id, data)
 }
 
@@ -107,16 +91,6 @@ exports.cancelBooking = async (id, user) => {
 
     if (!isOwner && user?.role !== 'admin' && user?.role !== 'pitch_owner') {
         throw new AppError('You do not have permission to cancel this booking', 403)
-    }
-
-    if (booking.status !== 'cancelled') {
-        const slotIds = Array.isArray(booking.timeSlotId)
-            ? booking.timeSlotId
-            : [booking.timeSlotId]
-        for (const slot of slotIds) {
-            const slotId = slot?._id || slot
-            if (slotId) await timeSlotRepository.update(slotId, { status: 'available' })
-        }
     }
 
     return bookingRepository.update(id, { status: 'cancelled' })
