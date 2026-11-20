@@ -10,6 +10,7 @@ router.route('/')
         authController.restrictTo('admin', 'pitch_owner'), 
         timeSlotController.createTimeSlot
     )
+router.get('/pitch/:pitchId', timeSlotController.getPitchTimeSlotsByDate)
 router.route('/:id')
     .get(timeSlotController.getTimeSlotById)
     .delete (

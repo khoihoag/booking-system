@@ -12,11 +12,17 @@ exports.findById = async (id) => {
     return TimeSlot.findById(id).populate('pitchId');
 };
 
+exports.findByPitchId = async (pitchId) => {
+    return TimeSlot.find({
+        pitchId: pitchId
+    }).lean()
+}
+
 // Tìm nhiều TimeSlot theo danh sách ID
 exports.findByIds = async (ids) => {
     return TimeSlot.find({
         _id: { $in: ids }
-    }).populate('pitchId');
+    }).populate('pitchId').lean();
 };
 
 // Cập nhật trạng thái nhiều TimeSlot

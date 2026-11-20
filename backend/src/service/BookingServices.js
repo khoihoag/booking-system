@@ -67,6 +67,10 @@ exports.getMyBookings = async (userId) => {
     return bookingRepository.findByUser(userId)
 }
 
+exports.findBookingsByDateNpitchId = async (date, pitchId) => {
+    return bookingRepository.findByPitchIdNDate(pitchId, date)
+}
+
 exports.findBookingById = async (id) => {
     return bookingRepository.findById(id)
 }

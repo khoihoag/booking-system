@@ -40,6 +40,22 @@ exports.findByUser = async (userId) => {
         })
 }
 
+exports.findByPitchIdNDate = async (pitchId, date) => {
+    console.log(4)
+    return Booking.find({
+        pitchId: pitchId,
+        date: date
+    }) .populate({
+            path: 'timeSlotId',
+            populate: { path: 'pitchId' }
+        })
+        .populate({
+            path: 'userId',
+            select: 'name email'
+        })
+}
+``
+
 exports.update = async (id, data) => {
     const booking = await Booking.findById(id)
 

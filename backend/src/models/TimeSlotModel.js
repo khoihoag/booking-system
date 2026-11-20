@@ -13,14 +13,6 @@ const timeSlotSchema = new mongoose.Schema(
             type: String,
             required: [true, 'a time slot must have a time ']
         },
-        status: {
-            type: String,
-            default: 'available',
-            enum: {
-                values: ['available', 'booked', 'locked'],
-                message: 'status must be available, booked, held, blocked, or maintenance'
-            }
-        },
         price: {
             type: Number,
             required: [true, 'a time slot must have a price'],
