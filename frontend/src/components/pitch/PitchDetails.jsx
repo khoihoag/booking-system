@@ -89,17 +89,17 @@ export default function PitchDetails() {
     setHasLoadError(false);
     setErrorMsg("");
     setPitch(undefined);
-    axios
-      .get(`/api/pitch/${id}`)
+    api
+      .get(`/pitch/${id}`)
       .then((res) => {
         const pitchRes = res.data;
         setPitch(pitchRes.data);
         setActiveImage(pitchRes.data?.imageUrl);
-        setTimeSlots(
-          Array.isArray(pitchRes.data?.time_slots)
-            ? pitchRes.data.time_slots
-            : [],
-        );
+        // setTimeSlots(
+        //   Array.isArray(pitchRes.data?.time_slots)
+        //     ? pitchRes.data.time_slots
+        //     : [],
+        // );
       })
       .catch((err) => {
         console.log(err);
@@ -111,9 +111,20 @@ export default function PitchDetails() {
       });
   }, [id]);
 
+  useEffect(() => {
+    setSelectedSlotIds([]);
+    api.get(`/timeSlot/pitch/${id}?date=${selectedDate}`).then((res) => {
+      setTimeSlots(res.data.data)
+    }).catch(err => {
+      console.log(err);
+        setErrorMsg(err.response?.data?.message || "Không thể tải thông tin slots");
+        setHasLoadError(true);
+    })
+  }, [id, selectedDate])
 
-  const handleSlotToggle = (slotId, status) => {
-    if (status !== "available") return;
+
+  const handleSlotToggle = (slotId, isBooked) => {
+    if (isBooked) return;
     setSelectedSlotIds((prev) =>
       prev.includes(slotId)
         ? prev.filter((item) => item !== slotId)
@@ -137,7 +148,7 @@ export default function PitchDetails() {
 
     // Lấy lại những ca đã chọn từ danh sách API
     const restoredSlotIds = timeSlots
-      .filter((slot) => pendingSlotIds.includes(slot._id) && slot.status === "available")
+      .filter((slot) => pendingSlotIds.includes(slot._id) && !slot.isBooked)
       .map((slot) => slot._id);
 
     setSelectedSlotIds(restoredSlotIds);
@@ -617,17 +628,17 @@ export default function PitchDetails() {
                           <button
                             key={slot._id}
                             type="button"
-                            disabled={slot.status !== "available"}
+                            disabled={slot.isBooked}
                             onClick={() => {
-                              handleSlotToggle(slot._id, slot.status);
+                              handleSlotToggle(slot._id, slot.isBooked);
                             }}
-                            className={`pitch-slot-button ${slot.status !== "available" ? "booked" : ""} ${isSelected ? "selected" : ""}`}
+                            className={`pitch-slot-button ${slot.isBooked ? "booked" : ""} ${isSelected ? "selected" : ""}`}
                           >
                             <div className="pitch-slot-time-text">
                               {slot.time}
                             </div>
                             <div className="pitch-slot-price-text">
-                              {slot.status === "booked" ? "Booked" : slot.status === "Locked" ? "locked" : formatVND(slot.price)}
+                              {slot.isBooked ? "Booked" : formatVND(slot.price)}
                             </div>
                           </button>
                         );
@@ -649,17 +660,17 @@ export default function PitchDetails() {
                           <button
                             key={slot._id}
                             type="button"
-                            disabled={slot.status !== "available"}
+                            disabled={slot.isBooked}
                             onClick={() => {
-                              handleSlotToggle(slot._id, slot.status);
+                              handleSlotToggle(slot._id, slot.isBooked);
                             }}
-                            className={`pitch-slot-button ${slot.status !== "available" ? "booked" : ""} ${isSelected ? "selected" : ""}`}
+                            className={`pitch-slot-button ${slot.isBooked ? "booked" : ""} ${isSelected ? "selected" : ""}`}
                           >
                             <div className="pitch-slot-time-text">
                               {slot.time}
                             </div>
                             <div className="pitch-slot-price-text">
-                              {slot.status === "booked" ? "Booked" : slot.status === "Locked" ? "locked" : formatVND(slot.price)}
+                              {slot.isBooked ? "Booked" : formatVND(slot.price)}
                             </div>
                           </button>
                         );
@@ -686,17 +697,17 @@ export default function PitchDetails() {
                           <button
                             key={slot._id}
                             type="button"
-                            disabled={slot.status !== "available"}
+                            disabled={slot.isBooked}
                             onClick={() => {
-                              handleSlotToggle(slot._id, slot.status);
+                              handleSlotToggle(slot._id, slot.isBooked);
                             }}
-                            className={`pitch-slot-button ${slot.status !== "available" ? "booked" : ""} ${isSelected ? "selected" : ""}`}
+                            className={`pitch-slot-button ${slot.isBooked ? "booked" : ""} ${isSelected ? "selected" : ""}`}
                           >
                             <div className="pitch-slot-time-text">
                               {slot.time}
                             </div>
                             <div className="pitch-slot-price-text">
-                              {slot.status === "booked" ? "Booked" : slot.status === "Locked" ? "locked" : formatVND(slot.price)}
+                              {slot.isBooked ? "Booked" : formatVND(slot.price)}
                             </div>
                           </button>
                         );
