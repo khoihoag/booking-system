@@ -14,7 +14,7 @@ const bookingSchema = new mongoose.Schema(
             required: [true, 'A booking must belong to a user']
         },
         date: {
-            type: String,
+            type: Date,
             required: [true, 'A booking must have a date']
         },
         status: {

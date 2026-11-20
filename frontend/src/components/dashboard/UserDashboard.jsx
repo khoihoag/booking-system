@@ -35,7 +35,7 @@ export default () => {
           pitchName: pitch.name || 'Sân bóng',
           pitchType: pitch.pitchType || '7-a-side',
           location: pitch.address || 'Chưa cập nhật',
-          date: booking.date || (booking.created_at ? new Date(booking.created_at).toISOString().slice(0, 10) : 'Chưa cập nhật'),
+          date: booking.date || 'Chưa cập nhật',
           timeSlots: slots.map((slot) => slot.time).filter(Boolean),
           durationHours: slots.length * 1.5,
           totalPrice: slots.reduce((total, slot) => total + (slot.price || 0), 0),
