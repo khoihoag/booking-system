@@ -1,10 +1,9 @@
 const bookingRepository = require('../repositories/BookingRepository')
 const timeSlotRepository = require('../repositories/TimeSlotRepository')
 const AppError = require('../utils/AppError')
+const bookingLifecycleService = require('./BookingLifecycleService')
 
 exports.createBooking = async (data) => {
-    await bookingRepository.expirePending()
-    
     const { timeSlotId, userId, date } = data;
 
     if (!date) {
@@ -75,61 +74,18 @@ exports.findBookingById = async (id) => {
     return bookingRepository.findById(id)
 }
 
-const allowedTransitions = {
-    pending: new Set(['confirmed', 'cancelled']),
-    confirmed: new Set(['completed', 'cancelled']),
-    completed: new Set(),
-    cancelled: new Set()
-}
-
 exports.updateBooking = async (id, data, user) => {
-    const booking = await bookingRepository.findById(id)
-    if (!booking) {
-        return null
-    }
-
-    const bookingUserId = booking.userId?._id ? booking.userId._id.toString() : booking.userId?.toString()
-    const currentUserId = (user?._id || user?.id || user)?.toString()
-    const isOwner = bookingUserId && currentUserId && bookingUserId === currentUserId
-    if (!isOwner && user?.role !== 'admin' && user?.role !== 'pitch_owner') {
-        throw new AppError('You do not have permission to update this booking', 403)
-    }
-
-    const nextStatus = data.status
-    if (!nextStatus || Object.keys(data).some(key => key !== 'status')) {
+    if (!data.status || Object.keys(data).some(key => key !== 'status')) {
         throw new AppError('Only booking status can be updated', 400)
     }
-    if (nextStatus !== 'cancelled' && user?.role !== 'admin' && user?.role !== 'pitch_owner') {
-        throw new AppError('Only the pitch owner or admin can confirm or complete a booking', 403)
+    const handlers = {
+        confirmed: bookingLifecycleService.confirmBooking,
+        cancelled: bookingLifecycleService.cancelBooking,
+        refunded: bookingLifecycleService.refundBooking,
+        completed: bookingLifecycleService.completeBooking
     }
-    if (!allowedTransitions[booking.status]?.has(nextStatus)) {
-        throw new AppError(`Cannot change booking from ${booking.status} to ${nextStatus}`, 400)
-    }
-    if (booking.status === 'pending' && booking.expiresAt <= new Date()) {
-        await bookingRepository.update(id, { status: 'cancelled' })
-        throw new AppError('Payment window has expired', 400)
-    }
-
-    return bookingRepository.update(id, { status: nextStatus })
+    if (!handlers[data.status]) throw new AppError('Invalid booking status transition', 400)
+    return handlers[data.status](id, user)
 }
 
-exports.cancelBooking = async (id, user) => {
-    const booking = await bookingRepository.findById(id)
-    if (!booking) {
-        return null
-    }
-
-    const bookingUserId = booking.userId?._id ? booking.userId._id.toString() : booking.userId?.toString()
-    const currentUserId = (user?._id || user?.id || user)?.toString()
-    const isOwner = bookingUserId && currentUserId && bookingUserId === currentUserId
-
-    if (!isOwner && user?.role !== 'admin' && user?.role !== 'pitch_owner') {
-        throw new AppError('You do not have permission to cancel this booking', 403)
-    }
-
-    if (!allowedTransitions[booking.status]?.has('cancelled')) {
-        throw new AppError(`Cannot cancel a ${booking.status} booking`, 400)
-    }
-
-    return bookingRepository.update(id, { status: 'cancelled' })
-}
+exports.cancelBooking = (id, user) => bookingLifecycleService.cancelBooking(id, user)

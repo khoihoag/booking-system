@@ -1,5 +1,6 @@
 const bookingServices = require('../service/BookingServices')
 const catchAsync = require('../utils/CatchAsyns')
+const bookingLifecycleService = require('./../service/BookingLifecycleService')
 const AppError = require('../utils/AppError')
 
 exports.createBooking = catchAsync(async (req, res, next) => {
@@ -16,6 +17,29 @@ exports.createBooking = catchAsync(async (req, res, next) => {
         data: booking
     })
 })
+
+exports.confirmPayment = catchAsync(async (req, res, next) => {
+    const bookingId = req.params.id
+    const user = req.user
+
+    const booking = await bookingLifecycleService.confirmBooking(bookingId, user)
+
+    res.status(200).json({
+        status: 'success',
+        data: booking
+    })
+})
+
+exports.refundBooking = catchAsync(async (req, res) => {
+    const booking = await bookingLifecycleService.refundBooking(req.params.id, req.user)
+    res.status(200).json({ status: 'success', data: booking })
+})
+
+exports.completeBooking = catchAsync(async (req, res) => {
+    const booking = await bookingLifecycleService.completeBooking(req.params.id, req.user)
+    res.status(200).json({ status: 'success', data: booking })
+})
+
 
 exports.getAllBookings = catchAsync(async (req, res, next) => {
     const bookings = await bookingServices.getAllBookings()
@@ -75,7 +99,7 @@ exports.updateBooking = catchAsync(async (req, res, next) => {
 
 exports.cancelBooking = catchAsync(async (req, res, next) => {
     const bookingId = req.params.id || req.params._id
-    const booking = await bookingServices.cancelBooking(bookingId, req.user)
+    const booking = await bookingLifecycleService.cancelBooking(bookingId, req.user)
 
     if (!booking) {
         return next(new AppError('No booking found with that ID', 404))

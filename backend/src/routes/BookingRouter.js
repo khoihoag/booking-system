@@ -9,6 +9,9 @@ const router = express.Router()
 router.use(authController.protect)
 
 router.get('/my-bookings', bookingController.getMyBookings)
+router.post('/:id/confirm-payment', bookingController.confirmPayment)
+router.post('/:id/refund', bookingController.refundBooking)
+router.post('/:id/complete', bookingController.completeBooking)
 
 router.route('/')
     .get(authController.restrictTo('admin'), bookingController.getAllBookings)
@@ -18,5 +21,4 @@ router.route('/:id')
     .get(bookingController.getBookingById)
     .patch(bookingController.updateBooking)
     .delete(bookingController.cancelBooking)
-
 module.exports = router

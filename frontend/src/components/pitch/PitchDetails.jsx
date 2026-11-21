@@ -285,7 +285,7 @@ export default function PitchDetails() {
         date: selectedDate,
       });
 
-      await api.patch(`/booking/${response.data.data._id}`, { status: "confirmed" });
+      await api.post(`/booking/${response.data.data._id}/confirm-payment`);
 
       console.log(1);
       setModalStep("success");
