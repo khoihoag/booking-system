@@ -70,13 +70,38 @@ exports.findBookingById = async (id) => {
     return bookingRepository.findById(id)
 }
 
-exports.updateBooking = async (id, data) => {
+const allowedTransitions = {
+    pending: new Set(['confirmed', 'cancelled']),
+    confirmed: new Set(['completed', 'cancelled']),
+    completed: new Set(),
+    cancelled: new Set()
+}
+
+exports.updateBooking = async (id, data, user) => {
     const booking = await bookingRepository.findById(id)
     if (!booking) {
         return null
     }
 
-    return bookingRepository.update(id, data)
+    const bookingUserId = booking.userId?._id ? booking.userId._id.toString() : booking.userId?.toString()
+    const currentUserId = (user?._id || user?.id || user)?.toString()
+    const isOwner = bookingUserId && currentUserId && bookingUserId === currentUserId
+    if (!isOwner && user?.role !== 'admin' && user?.role !== 'pitch_owner') {
+        throw new AppError('You do not have permission to update this booking', 403)
+    }
+
+    const nextStatus = data.status
+    if (!nextStatus || Object.keys(data).some(key => key !== 'status')) {
+        throw new AppError('Only booking status can be updated', 400)
+    }
+    if (nextStatus !== 'cancelled' && user?.role !== 'admin' && user?.role !== 'pitch_owner') {
+        throw new AppError('Only the pitch owner or admin can confirm or complete a booking', 403)
+    }
+    if (!allowedTransitions[booking.status]?.has(nextStatus)) {
+        throw new AppError(`Cannot change booking from ${booking.status} to ${nextStatus}`, 400)
+    }
+
+    return bookingRepository.update(id, { status: nextStatus })
 }
 
 exports.cancelBooking = async (id, user) => {
@@ -91,6 +116,10 @@ exports.cancelBooking = async (id, user) => {
 
     if (!isOwner && user?.role !== 'admin' && user?.role !== 'pitch_owner') {
         throw new AppError('You do not have permission to cancel this booking', 403)
+    }
+
+    if (!allowedTransitions[booking.status]?.has('cancelled')) {
+        throw new AppError(`Cannot cancel a ${booking.status} booking`, 400)
     }
 
     return bookingRepository.update(id, { status: 'cancelled' })

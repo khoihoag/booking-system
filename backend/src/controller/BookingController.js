@@ -61,7 +61,7 @@ exports.getBookingById = catchAsync(async (req, res, next) => {
 
 exports.updateBooking = catchAsync(async (req, res, next) => {
     const bookingId = req.params.id || req.params._id
-    const booking = await bookingServices.updateBooking(bookingId, req.body)
+    const booking = await bookingServices.updateBooking(bookingId, req.body, req.user)
 
     if (!booking) {
         return next(new AppError('No booking found with that ID', 404))
