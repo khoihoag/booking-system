@@ -25,7 +25,7 @@ export default () => {
   const [copiedCode, setCopiedCode] = useState(false);
 
   useEffect(() => {
-    api.get('/booking/my-bookings')
+    const loadBookings = () => api.get('/booking/my-bookings')
       .then(({ data }) => setBookings(data.data.map((booking) => {
         const slots = Array.isArray(booking.timeSlotId) ? booking.timeSlotId : [booking.timeSlotId];
         const pitch = slots[0]?.pitchId || {};
@@ -43,16 +43,19 @@ export default () => {
         };
       })))
       .catch(() => addToast('error', 'Không thể tải dữ liệu', 'Vui lòng thử lại sau.'));
+    loadBookings();
+    const refresh = setInterval(loadBookings, 60 * 1000);
+    return () => clearInterval(refresh);
   }, []);
 
   // Phân loại trận đấu
-  const upcomingBookings = bookings.filter(b => b.status === 'confirmed');
-  const pastBookings = bookings.filter(b => b.status === 'completed' || b.status === 'cancelled');
+  const upcomingBookings = bookings.filter(b => b.status === 'pending' || b.status === 'confirmed');
+  const pastBookings = bookings.filter(b => ['completed', 'cancelled', 'refunded'].includes(b.status));
 
   // Lọc lịch sử
   const filteredPastBookings = pastBookings.filter(b => {
     if (historyFilter === 'completed') return b.status === 'completed';
-    if (historyFilter === 'cancelled') return b.status === 'cancelled';
+    if (historyFilter === 'cancelled') return b.status === 'cancelled' || b.status === 'refunded';
     return true;
   });
 
@@ -71,7 +74,10 @@ export default () => {
     setBookings(prev => 
       prev.map(b => b.id === bookingToCancel.id ? { ...b, status: 'cancelled' } : b)
     );
-    api.delete(`/booking/${bookingToCancel.id}`);
+    api.delete(`/booking/${bookingToCancel.id}`).catch(() => {
+      setBookings(prev => prev.map(b => b.id === bookingToCancel.id ? bookingToCancel : b));
+      addToast('error', 'Không thể hủy lịch', 'Vui lòng thử lại sau.');
+    });
     addToast('info', 'Đã hủy lịch thi đấu', `Trận đấu #${bookingToCancel.id} tại ${bookingToCancel.pitchName} đã được hủy.`);
     setBookingToCancel(null);
   };
@@ -451,7 +457,7 @@ export default () => {
                             color: b.status === 'completed' ? '#059669' : '#e11d48',
                             border: `1px solid ${b.status === 'completed' ? '#a7f3d0' : '#fecdd3'}`
                           }}>
-                            {b.status === 'completed' ? 'HOÀN THÀNH' : 'ĐÃ HỦY'}
+                            {b.status === 'completed' ? 'HOÀN THÀNH' : b.status === 'refunded' ? 'ĐÃ HOÀN TIỀN' : 'ĐÃ HỦY'}
                           </span>
                         </td>
                         <td style={{ textAlign: 'center' }}>

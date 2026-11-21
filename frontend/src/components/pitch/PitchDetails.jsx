@@ -69,6 +69,8 @@ export default function PitchDetails() {
   const [modalStep, setModalStep] = useState("summary_qr");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [bookingCode, setBookingCode] = useState("BK-9201");
+  const [bookingExpiresAt, setBookingExpiresAt] = useState(null);
+  const [paymentSecondsLeft, setPaymentSecondsLeft] = useState(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [organizerName, setOrganizerName] = useState(
     currentUser?.name || "Khoi Hoang",
@@ -284,6 +286,7 @@ export default function PitchDetails() {
         timeSlotId: selectedSlotIds,
         date: selectedDate,
       });
+      setBookingExpiresAt(response.data.data.expiresAt);
 
       await api.post(`/booking/${response.data.data._id}/confirm-payment`);
 
@@ -302,6 +305,14 @@ export default function PitchDetails() {
       // setModalStep("success"); // Chuyển sang bước thông báo thành công
     }, 650);
   };
+
+  useEffect(() => {
+    if (!bookingExpiresAt) return undefined;
+    const updateCountdown = () => setPaymentSecondsLeft(Math.max(0, Math.ceil((new Date(bookingExpiresAt) - Date.now()) / 1000)));
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
+    return () => clearInterval(timer);
+  }, [bookingExpiresAt]);
 
   const handleCopyBookingCode = () => {
     navigator.clipboard.writeText(bookingCode);
@@ -864,6 +875,13 @@ export default function PitchDetails() {
                     #{bookingCode}
                   </strong>
                 </p>
+                {paymentSecondsLeft !== null && (
+                  <p className="pitch-modal-code-text" style={{ color: paymentSecondsLeft ? '#b45309' : '#dc2626' }}>
+                    {paymentSecondsLeft
+                      ? `Thời gian thanh toán còn ${Math.floor(paymentSecondsLeft / 60)}:${String(paymentSecondsLeft % 60).padStart(2, '0')}`
+                      : 'Booking đã hết hạn thanh toán'}
+                  </p>
+                )}
               </div>
 
               {/* Modal Flow Grid: Left Summary vs Right VietQR */}
