@@ -17,6 +17,7 @@ const bookingSchema = new mongoose.Schema(
             type: Date,
             required: [true, 'A booking must have a date']
         },
+        expiresAt: Date,
         status: {
             type: String,
             enum: {

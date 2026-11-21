@@ -3,6 +3,7 @@ const timeSlotRepository = require('../repositories/TimeSlotRepository')
 const AppError = require('../utils/AppError')
 
 exports.createBooking = async (data) => {
+    await bookingRepository.expirePending()
     
     const { timeSlotId, userId, date } = data;
 
@@ -48,17 +49,20 @@ exports.createBooking = async (data) => {
         timeSlotId,
         userId,
         date,
-        status: 'confirmed'
+        status: 'pending',
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000)
     });
 
     return booking;
 };
 
 exports.getAllBookings = async () => {
+    await bookingRepository.expirePending()
     return bookingRepository.findAll()
 }
 
 exports.getMyBookings = async (userId) => {
+    await bookingRepository.expirePending()
     return bookingRepository.findByUser(userId)
 }
 
@@ -67,6 +71,7 @@ exports.findBookingsByDateNpitchId = async (date, pitchId) => {
 }
 
 exports.findBookingById = async (id) => {
+    await bookingRepository.expirePending()
     return bookingRepository.findById(id)
 }
 
@@ -99,6 +104,10 @@ exports.updateBooking = async (id, data, user) => {
     }
     if (!allowedTransitions[booking.status]?.has(nextStatus)) {
         throw new AppError(`Cannot change booking from ${booking.status} to ${nextStatus}`, 400)
+    }
+    if (booking.status === 'pending' && booking.expiresAt <= new Date()) {
+        await bookingRepository.update(id, { status: 'cancelled' })
+        throw new AppError('Payment window has expired', 400)
     }
 
     return bookingRepository.update(id, { status: nextStatus })
