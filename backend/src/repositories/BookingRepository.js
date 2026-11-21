@@ -56,6 +56,11 @@ exports.findByPitchIdNDate = async (pitchId, date) => {
             booking.timeSlotId.some(slot => String(slot.pitchId?._id || slot.pitchId) === String(pitchId))
         ))
 }
+
+exports.expirePending = () => Booking.updateMany(
+    { status: 'pending', expiresAt: { $lte: new Date() } },
+    { $set: { status: 'cancelled' } }
+)
 ``
 
 exports.update = async (id, data) => {

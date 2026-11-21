@@ -50,4 +50,29 @@ exports.expireBooking = async id => {
     return bookingRepository.update(id, { status: 'cancelled' })
 }
 
+exports.expirePendingBookings = () => bookingRepository.expirePending()
+
+exports.completeFinishedBookings = async () => {
+    const bookings = await bookingRepository.findAll({ status: 'confirmed' })
+    const now = new Date()
+
+    await Promise.all(bookings.map(async booking => {
+        const endTimes = (booking.timeSlotId || []).map(slot => {
+            const match = slot.time?.match(/-\s*(\d{1,2}):(\d{2})/)
+            if (!match) return null
+            const end = new Date(booking.date)
+            end.setHours(Number(match[1]), Number(match[2]), 0, 0)
+            return end
+        }).filter(Boolean)
+
+        const matchEnd = endTimes.sort((a, b) => b - a)[0]
+        if (matchEnd && matchEnd <= now) {
+            await bookingRepository.update(booking._id, {
+                status: 'completed',
+                completedAt: now
+            })
+        }
+    }))
+}
+
 exports.transitions = transitions
