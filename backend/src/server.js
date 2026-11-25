@@ -1,6 +1,9 @@
-const app = require('./app')
-const mongoose = require('mongoose')
 const dotenv = require('dotenv')
+dotenv.config({path: './config.env'})
+
+const app = require('./app')
+const db = require('./config/database')
+
 const bookingLifecycleService = require('./service/BookingLifecycleService')
 
 
@@ -21,17 +24,28 @@ function startBookingLifecycleJob() {
   runJob(); // Chạy ngay 1 lần lúc server vừa bật lên để dọn dẹp các đơn cũ trong lúc server tắt
 } 
 
-dotenv.config({path: './config.env'})
+async function startServer () {
+  try {
+        console.log({
+    DB_HOST: process.env.DB_HOST,
+    DB_USER: process.env.DB_USER,
+    DB_NAME: process.env.DB_NAME
+});
+    await db.query('SELECT 1')
+    console.log('MYSQL connected ...')
 
-const DB = process.env.DATABASE
-
-mongoose.connect(DB).then(() => {
-    console.log('connected...')
     startBookingLifecycleJob()
-})
 
-app.listen(3000, () => {
-    console.log('start')
-})
+    const PORT = process.env.PORT || 3000
 
+    app.listen(3000, () => {
+      console.log(`Server running on port: ${PORT}`)
+    })
+  } catch (error) {
+    console.log("Don't connected to MYSQL: ", error)
+    process.exit(1)
+  }
+}
+
+startServer()
 

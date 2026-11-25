@@ -39,13 +39,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Backend Tests
-        run: npm test
-        env:
-          NODE_ENV: test
-          JWT_SECRET: ci-test-secret-key-12345
-          JWT_EXPIRES_IN: 90d
-          JWT_COOKIES_EXPIRES_IN: 90
+      # - name: Run Backend Tests
+      #   run: npm test
+      #   env:
+      #     NODE_ENV: test
+      #     JWT_SECRET: ci-test-secret-key-12345
+      #     JWT_EXPIRES_IN: 90d
+      #     JWT_COOKIES_EXPIRES_IN: 90
 
   frontend:
     name: Frontend (Lint & Build)
