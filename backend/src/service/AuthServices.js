@@ -1,9 +1,9 @@
 const util = require("util");
 const jwt = require("jsonwebtoken");
+const bcrypt = require('bcryptjs')
 const crypto = require("crypto");
 
 const AppError = require("../utils/AppError");
-const userRepository = require("../repositories/UserRepository");
 const userRepository2 = require("./../repository2/UserRepository");
 const sendEmail = require("../utils/Email");
 
@@ -13,10 +13,39 @@ const signToken = (id) => {
   });
 };
 
+const correctPassword =  (candidatePassword, userPassword) => {
+    return  bcrypt.compare(candidatePassword, userPassword)
+}
+
+const changedPassword = (user, JWTTimeStamp) => {
+    if (user.passwordChangeAt) {
+        const changedTimeStamp = parseInt(new Date(user.passwordChangeAt).getTime() / 1000, 10)
+        return JWTTimeStamp < changedTimeStamp
+    }
+    return false
+}
+
+const createResetPasswordToken = (user) => {
+    const resetToken = crypto.randomBytes(32).toString('hex')
+
+    user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
+    user.passwordResetExpries = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+
+    return resetToken
+}
+
+// ====== SIGN UP ======
 exports.signup = async (userData) => {
   if (userData.password_confirm !== userData.password) {
     throw new AppError("Mật khẩu không khớp", 400);
   }
+
+  if (userData.password.length < 8) {
+    throw new AppError("Mật khẩu có ít nhất 8 ký tự", 400);
+  }
+
+  userData.password = await bcrypt.hash(userData.password, 12);
+  userData.password_confirm = undefined;
 
   const newUser = await userRepository2.create({
     name: userData.name,
@@ -27,24 +56,25 @@ exports.signup = async (userData) => {
   return { user: newUser, token };
 };
 
+
+// ====== LOG IN ======
 exports.login = async (email, password) => {
   if (!email || !password) {
     throw new AppError("Vui lòng nhập email và mật khẩu.", 400);
   }
 
-  const user = await userRepository.findByEmail(email, true);
-
-  if (!user || !(await user.correctPassword(password, user.password))) {
+  const user = await userRepository2.findByEmail(email, true);
+  if (!user || !(await correctPassword(password, user.password))) {
     throw new AppError("Email hoặc mật khẩu không chính xác.", 401);
   }
 
   // Hide password before returning
   user.password = undefined;
 
-  const token = signToken(user._id);
+  const token = signToken(user.id);
   return { user, token };
 };
-
+// ===== PROTECT ====
 exports.protect = async (token) => {
   if (!token) {
     throw new AppError(
@@ -57,8 +87,7 @@ exports.protect = async (token) => {
     token,
     process.env.JWT_SECRET,
   );
-
-  const currentUser = await userRepository.findById(decoded.id);
+  const currentUser = await userRepository2.findById(decoded.id);
   if (!currentUser) {
     throw new AppError(
       "Tài khoản không còn tồn tại. Vui lòng đăng nhập lại.",
@@ -66,7 +95,7 @@ exports.protect = async (token) => {
     );
   }
 
-  if (currentUser.changedPassword(decoded.iat)) {
+  if (changedPassword(currentUser, decoded.iat)) {
     throw new AppError(
       "Mật khẩu vừa được thay đổi. Vui lòng đăng nhập lại.",
       401,
@@ -76,18 +105,19 @@ exports.protect = async (token) => {
   return currentUser;
 };
 
+// ===== FORGOT PASSWORD =====
 exports.forgotPassword = async (email, protocol, host) => {
   if (!email) {
     throw new AppError("Vui lòng nhập địa chỉ email.", 400);
   }
 
-  const user = await userRepository.findByEmail(email);
+  const user = await userRepository2.findByEmail(email);
   if (!user) {
     throw new AppError("Không tìm thấy tài khoản với email này.", 404);
   }
 
-  const resetToken = user.createResetPasswordToken();
-  await userRepository.saveUser(user, { validateBeforeSave: false });
+  const resetToken = createResetPasswordToken(user);
+  await userRepository2.saveUser(user);
 
   const resetURL = `${protocol}://${host}/api/user/resetPassword/${resetToken}`;
   const message = `Forgot your password? Submit a PATCH request with your new password and password_confirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
@@ -99,9 +129,9 @@ exports.forgotPassword = async (email, protocol, host) => {
       message,
     });
   } catch (err) {
-    user.passwordResetToken = undefined;
-    user.passwordResetExpries = undefined;
-    await userRepository.saveUser(user, { validateBeforeSave: false });
+    user.passwordResetToken = null;
+    user.passwordResetExpries = null;
+    await userRepository2.saveUser(user);
 
     throw new AppError("Không thể gửi email. Vui lòng thử lại sau.", 500);
   }
@@ -109,45 +139,50 @@ exports.forgotPassword = async (email, protocol, host) => {
   return resetToken;
 };
 
+// ===== RESET PASWORD =====
 exports.resetPassword = async (token, password, password_confirm) => {
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
-  const user = await userRepository.findByResetToken(hashedToken);
+  const user = await userRepository2.findByResetToken(hashedToken);
   if (!user) {
     throw new AppError("Mã xác thực không hợp lệ hoặc đã hết hạn.", 400);
   }
 
   user.password = password;
   user.password_confirm = password_confirm;
-  user.passwordResetToken = undefined;
-  user.passwordResetExpries = undefined;
+  user.passwordResetToken = null;
+  user.passwordResetExpries = null;
 
-  await userRepository.saveUser(user);
+  await userRepository2.saveUser(user);
 
-  const newToken = signToken(user._id);
+  const newToken = signToken(user.id);
   return { user, token: newToken };
 };
 
+// ===== UPDATE PASSWORD =====
 exports.updatePassword = async (
   userId,
   passwordCurrent,
   password,
   password_confirm,
 ) => {
-  const user = await userRepository.findById(userId, true);
+  if (password !== password_confirm) {
+    throw new AppError("Mật khẩu xác nhận không khớp.", 401);
+  }
+
+  const user = await userRepository2.findById(userId, true);
   if (!user) {
     throw new AppError("Không tìm thấy tài khoản.", 404);
   }
 
-  if (!(await user.correctPassword(passwordCurrent, user.password))) {
+  if (!(await correctPassword(passwordCurrent, user.password))) {
     throw new AppError("Mật khẩu hiện tại không chính xác.", 401);
   }
 
   user.password = password;
-  user.password_confirm = password_confirm;
 
-  await userRepository.saveUser(user);
+  await userRepository2.saveUser(user);
 
-  const token = signToken(user._id);
+  const token = signToken(user.id);
   return { user, token };
 };
