@@ -7,10 +7,10 @@ const transitions = {
     cancelled: [], refunded: [], completed: []
 }
 
-const getUserId = user => (user?._id || user?.id || user)?.toString()
+const getUserId = user => (user.id || user)?.toString()
 
 const assertOwnerOrStaff = (booking, user) => {
-    const ownerId = booking.userId?._id?.toString() || booking.userId?.toString()
+    const ownerId = booking.userId.id?.toString() || booking.userId?.toString()
     if (ownerId !== getUserId(user) && !['admin', 'pitch_owner'].includes(user?.role)) {
         throw new AppError('You do not have permission to update this booking', 403)
     }

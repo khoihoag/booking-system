@@ -1,4 +1,4 @@
-const pitchRepository = require('./../repositories/PitchRepository')
+const pitchRepository = require('./../repository2/PitchRepository')
 
 exports.createPitch = async (data) => {
     return pitchRepository.create(data)

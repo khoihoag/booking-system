@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs')
 const crypto = require("crypto");
 
 const AppError = require("../utils/AppError");
-const userRepository2 = require("./../repository2/UserRepository");
+const userRepository = require("./../repository2/UserRepository");
 const sendEmail = require("../utils/Email");
 
 const signToken = (id) => {
@@ -47,7 +47,7 @@ exports.signup = async (userData) => {
   userData.password = await bcrypt.hash(userData.password, 12);
   userData.password_confirm = undefined;
 
-  const newUser = await userRepository2.create({
+  const newUser = await userRepository.create({
     name: userData.name,
     email: userData.email,
     password: userData.password,
@@ -63,7 +63,7 @@ exports.login = async (email, password) => {
     throw new AppError("Vui lòng nhập email và mật khẩu.", 400);
   }
 
-  const user = await userRepository2.findByEmail(email, true);
+  const user = await userRepository.findByEmail(email, true);
   if (!user || !(await correctPassword(password, user.password))) {
     throw new AppError("Email hoặc mật khẩu không chính xác.", 401);
   }
@@ -87,7 +87,7 @@ exports.protect = async (token) => {
     token,
     process.env.JWT_SECRET,
   );
-  const currentUser = await userRepository2.findById(decoded.id);
+  const currentUser = await userRepository.findById(decoded.id);
   if (!currentUser) {
     throw new AppError(
       "Tài khoản không còn tồn tại. Vui lòng đăng nhập lại.",
@@ -111,13 +111,13 @@ exports.forgotPassword = async (email, protocol, host) => {
     throw new AppError("Vui lòng nhập địa chỉ email.", 400);
   }
 
-  const user = await userRepository2.findByEmail(email);
+  const user = await userRepository.findByEmail(email);
   if (!user) {
     throw new AppError("Không tìm thấy tài khoản với email này.", 404);
   }
 
   const resetToken = createResetPasswordToken(user);
-  await userRepository2.saveUser(user);
+  await userRepository.saveUser(user);
 
   const resetURL = `${protocol}://${host}/api/user/resetPassword/${resetToken}`;
   const message = `Forgot your password? Submit a PATCH request with your new password and password_confirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
@@ -131,7 +131,7 @@ exports.forgotPassword = async (email, protocol, host) => {
   } catch (err) {
     user.passwordResetToken = null;
     user.passwordResetExpries = null;
-    await userRepository2.saveUser(user);
+    await userRepository.saveUser(user);
 
     throw new AppError("Không thể gửi email. Vui lòng thử lại sau.", 500);
   }
@@ -153,7 +153,7 @@ exports.resetPassword = async (token, password, password_confirm) => {
   user.passwordResetToken = null;
   user.passwordResetExpries = null;
 
-  await userRepository2.saveUser(user);
+  await userRepository.saveUser(user);
 
   const newToken = signToken(user.id);
   return { user, token: newToken };
@@ -170,7 +170,7 @@ exports.updatePassword = async (
     throw new AppError("Mật khẩu xác nhận không khớp.", 401);
   }
 
-  const user = await userRepository2.findById(userId, true);
+  const user = await userRepository.findById(userId, true);
   if (!user) {
     throw new AppError("Không tìm thấy tài khoản.", 404);
   }
@@ -181,7 +181,7 @@ exports.updatePassword = async (
 
   user.password = password;
 
-  await userRepository2.saveUser(user);
+  await userRepository.saveUser(user);
 
   const token = signToken(user.id);
   return { user, token };

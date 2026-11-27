@@ -21,7 +21,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 })
 
 exports.getUserById = catchAsync(async (req, res, next) => {
-    const user = await userServices.findUserById(req.params._id)
+    const user = await userServices.findUserById(req.params.id)
 
     if (!user) {
         return next(new AppError('Không tìm thấy tài khoản.', 404))
@@ -84,7 +84,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 })
 
 exports.getMe = catchAsync(async (req, res, next) => {
-    const me = await userServices.findUserById(req.user._id)
+    const me = await userServices.findUserById(req.user.id)
 
     if (!me) {
         return next(new AppError('No user found with that ID', 404))

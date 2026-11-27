@@ -75,7 +75,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   const { user, token } = await authServices.resetPassword(
     req.params.token,
     req.body.password,
-    req.body.password_confirm,
+    req.body.passwordConfirm,
   );
 
   createSendToken(user, 200, token, res);
@@ -83,11 +83,12 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 // Cập nhật mật khẩu khi đã đăng nhập
 exports.updatePassword = catchAsync(async (req, res, next) => {
+  console.log(1)
   const { user, token } = await authServices.updatePassword(
-    req.user._id || req.user.id,
+    req.user.id,
     req.body.passwordCurrent,
     req.body.password,
-    req.body.password_confirm,
+    req.body.passwordConfirm,
   );
 
   createSendToken(user, 200, token, res);

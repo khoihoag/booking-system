@@ -1,4 +1,4 @@
-const timeSlotRepository = require('./../repositories/TimeSlotRepository')
+const timeSlotRepository = require('./../repository2/TimeSlotRepository')
 const bookingServices = require('./BookingServices')
 
 exports.createTimeSlot = async (data) => {

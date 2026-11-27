@@ -1,4 +1,4 @@
-const userRepository = require('../repositories/UserRepository')
+const userRepository = require('./../repository2/UserRepository')
 const AppError = require('../utils/AppError')
 
 const filterObj = (obj, ...allowedFields) => {
@@ -28,18 +28,13 @@ exports.updateUser = async (userId, body) => {
     }
 
     const filteredBody = filterObj(body, 'name', 'email', 'role', 'phone', 'city', 'bio', 'preferredType', 'position', 'preferredFoot', 'jerseyNumber', 'twoFactorEnabled', 'smsReminder', 'zaloNotification', 'promoAlerts')
-    const updatedUser = await userRepository.update(userId, filteredBody)
+    const updatedUser = await userRepository2.update(userId, filteredBody)
 
     if (!updatedUser) {
         throw new AppError('Không tìm thấy tài khoản.', 404)
     }
 
     return updatedUser
-}
-
-
-exports.deleteUser = async (id) => {
-    return userRepository.delete(id)
 }
 
 exports.updateData = async (userId, body) => {
@@ -48,7 +43,7 @@ exports.updateData = async (userId, body) => {
     }
 
     const filteredBody = filterObj(body, 'name', 'email', 'phone', 'city', 'bio', 'preferredType', 'position', 'preferredFoot', 'jerseyNumber', 'twoFactorEnabled', 'smsReminder', 'zaloNotification', 'promoAlerts')
-    const updatedUser = await userRepository.update(userId, filteredBody)
+    const updatedUser = await userRepository2.update(userId, filteredBody)
 
     if (!updatedUser) {
         throw new AppError('Không tìm thấy tài khoản.', 404)
@@ -56,4 +51,9 @@ exports.updateData = async (userId, body) => {
 
     return updatedUser
 }
+
+exports.deleteUser = async (id) => {
+    return userRepository2.delete(id)
+}
+
 
