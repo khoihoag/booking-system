@@ -1,45 +1,51 @@
-const Pitch = require('./../models/PitchModel')
-const mongoose = require('mongoose')
+const pool = require("../config/database");
+const crypto = require("crypto");
+const select =
+  "SELECT p.*, u.name AS owner_name, u.email AS owner_email FROM pitches p LEFT JOIN users u ON u.id = p.owner_id";
+const map = (row) =>
+  row && {
+    ...row,
+    _id: row.id,
+    ownerId: row.owner_id,
+    owner: { name: row.owner_name, email: row.owner_email },
+  };
 
 exports.create = async (data) => {
-    return Pitch.create(data)
-}
-
-exports.findOne = async (filter) => {
-    let queryFilter = filter
-    if (filter && filter._id && !mongoose.Types.ObjectId.isValid(filter._id)) {
-        queryFilter = { id: filter._id }
-    }
-    return await Pitch.findOne(queryFilter).populate({
-        path: 'ownerId',
-        select: 'name email -_id'
-    }).populate({
-        path: 'time_slots'
-    })
-}
-
+  const id = crypto.randomUUID();
+  const [r] = await pool.execute(
+    "INSERT INTO pitches (id, owner_id, name, address, status) VALUES (?, ?, ?, ?, ?)",
+    [id, data.ownerId, data.name, data.address, data.status || "active"],
+  );
+  return exports.findOne({ _id: id });
+};
+exports.findOne = async (filter = {}) => {
+  const [rows] = await pool.execute(`${select} WHERE p.id = ? LIMIT 1`, [
+    filter._id,
+  ]);
+  return map(rows[0]);
+};
 exports.findByFilter = async (filter = {}) => {
-    return await Pitch.find(filter).populate({
-        path: 'ownerId',
-        select: ['name', 'email', '-_id']
-    }).populate({
-        path: 'time_slots'
-    })
-}
-
+  const [rows] = await pool.execute(
+    `${select} ${filter.ownerId ? "WHERE p.owner_id = ?" : ""}`,
+    filter.ownerId ? [filter.ownerId] : [],
+  );
+  return rows.map(map);
+};
 exports.update = async (id, data) => {
-    const filter = mongoose.Types.ObjectId.isValid(id) ? { _id: id } : { id: id }
-    const pitch = await Pitch.findOne(filter)
-
-    if (!pitch) {
-        return null
-    }
-
-    Object.assign(pitch, data)
-    return pitch.save()
-}
-
+  const fields = Object.keys(data).filter((f) =>
+    ["owner_id", "ownerId", "name", "address", "status"].includes(f),
+  );
+  if (!fields.length) return exports.findOne({ _id: id });
+  const names = fields.map((f) => (f === "ownerId" ? "owner_id" : f));
+  const [r] = await pool.execute(
+    `UPDATE pitches SET ${names.map((f) => `${f} = ?`).join(", ")} WHERE id = ?`,
+    [...fields.map((f) => data[f]), id],
+  );
+  return r.affectedRows ? exports.findOne({ _id: id }) : null;
+};
 exports.delete = async (id) => {
-    const filter = mongoose.Types.ObjectId.isValid(id) ? { _id: id } : { id: id }
-    return Pitch.findOneAndDelete(filter)
-}
+  const old = await exports.findOne({ _id: id });
+  if (!old) return null;
+  await pool.execute("DELETE FROM pitches WHERE id = ?", [id]);
+  return old;
+};

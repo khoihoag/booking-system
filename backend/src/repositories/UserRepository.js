@@ -1,45 +1,163 @@
-const User = require('../models/UserModel')
+const pool = require("./../config/database");
+const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 
 exports.create = async (data) => {
-    return await User.create(data)
-}
+  const id = crypto.randomUUID();
+
+  const sql = `
+    INSERT INTO users (id, name, email, phoneNumber, password, role)
+    VALUE  (?, ?, ?, ?, ?, ?)`;
+
+  const [result] = await pool.execute(sql, [
+    id,
+    data.name,
+    data.email,
+    data.phoneNumber || data.phone || null,
+    data.password,
+    data.role || "user",
+  ]);
+
+  return { id: id, ...data };
+};
 
 exports.findAll = async () => {
-    return await User.find().populate('pitches')
-}
+  const sql = `SELECT * FROM users`;
+
+  const [result] = await pool.execute(sql);
+  return result;
+};
 
 exports.findById = async (id, selectPassword = false) => {
-    if (selectPassword) {
-        return await User.findById(id).select('+password')
-    }
-    return await User.findById(id).populate('pitches')
-}
+  const columns = selectPassword
+    ? "*"
+    : "id, name, email, role, phoneNumber, passwordChangeAt";
+
+  const sql = `
+        SELECT ${columns}
+        FROM users
+        WHERE id = ?
+    `;
+
+  const [result] = await pool.execute(sql, [id]);
+
+  return result[0];
+};
 
 exports.findByEmail = async (email, selectPassword = false) => {
-    if (selectPassword) {
-        return await User.findOne({ email }).select('+password')
-    }
-    return await User.findOne({ email })
-}
+  const columns = selectPassword ? "*" : "id, name, email, role";
+
+  const sql = `
+        SELECT ${columns}
+        FROM users
+        WHERE email = ?
+    `;
+
+  const [result] = await pool.execute(sql, [email]);
+
+  return result[0];
+};
 
 exports.findByResetToken = async (hashedToken) => {
-    return await User.findOne({
-        passwordResetToken: hashedToken,
-        passwordResetExpries: { $gt: Date.now() }
-    })
-}
+  const [result] = await pool.execute(
+    "SELECT * FROM users WHERE passwordResetToken = ? AND passwordResetExpries > NOW() LIMIT 1",
+    [hashedToken],
+  );
+
+  return result[0];
+};
 
 exports.update = async (id, data) => {
-    return await User.findByIdAndUpdate(id, data, {
-        returnDocument: 'after',
-        runValidators: true
-    })
-}
+  const fields = Object.keys(data).filter((field) =>
+    [
+      "name",
+      "email",
+      "role",
+      "phone",
+      "phoneNumber",
+      "city",
+      "bio",
+      "preferredType",
+      "position",
+      "preferredFoot",
+      "jerseyNumber",
+      "twoFactorEnabled",
+      "smsReminder",
+      "zaloNotification",
+      "promoAlerts",
+    ].includes(field),
+  );
+  if (!fields.length) return exports.findById(id);
+  const names = fields.map(
+    (field) =>
+      ({
+        phone: "phoneNumber",
+        preferredType: "preferred_type",
+        preferredFoot: "preferred_foot",
+        jerseyNumber: "jersey_number",
+        twoFactorEnabled: "two_factor_enabled",
+        smsReminder: "sms_reminder",
+        zaloNotification: "zalo_notification",
+        promoAlerts: "promo_alerts",
+      })[field] || field,
+  );
+  const [result] = await pool.execute(
+    `UPDATE users SET ${names.map((field) => `${field} = ?`).join(", ")} WHERE id = ?`,
+    [...fields.map((field) => data[field]), id],
+  );
+  return result.affectedRows ? exports.findById(id) : null;
+};
 
-exports.saveUser = async (user, options = {}) => {
-    return await user.save(options)
-}
+exports.saveUser = async (user) => {
+  const fields = [
+    "name",
+    "email",
+    "password",
+    "role",
+    "phoneNumber",
+    "city",
+    "bio",
+    "preferredType",
+    "position",
+    "preferredFoot",
+    "jerseyNumber",
+    "twoFactorEnabled",
+    "smsReminder",
+    "zaloNotification",
+    "promoAlerts",
+    "passwordResetToken",
+    "passwordResetExpries",
+  ];
+  const updates = [];
+  const values = [];
+
+  for (const field of fields) {
+    if (user[field] === undefined) continue;
+    let value = user[field];
+    if (
+      field === "password" &&
+      typeof value === "string" &&
+      !value.startsWith("$2")
+    ) {
+      value = await bcrypt.hash(value, 12);
+    }
+    updates.push(`${field} = ?`);
+    values.push(value ?? null);
+  }
+
+  if (updates.length) {
+    await pool.execute(`UPDATE users SET ${updates.join(", ")} WHERE id = ?`, [
+      ...values,
+      user.id,
+    ]);
+  }
+  return exports.findById(user.id, true);
+};
 
 exports.delete = async (id) => {
-    return await User.findByIdAndDelete(id)
-}
+  const [result] = await pool.execute(
+    "UPDATE users SET active = 0 WHERE id = ?",
+    [id],
+  );
+  return result.affectedRows ? exports.findById(id) : null;
+};
