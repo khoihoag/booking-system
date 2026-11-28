@@ -34,7 +34,7 @@ exports.getUserById = catchAsync(async (req, res, next) => {
 })
 
 exports.updateUser = catchAsync(async (req, res, next) => {
-    const user = await userServices.updateUser(req.params._id, req.body)
+    const user = await userServices.updateUser(req.params.id, req.body)
 
     if (!user) {
         return next(new AppError('Không tìm thấy tài khoản.', 404))
@@ -47,7 +47,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 })
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
-    const user = await userServices.deleteUser(req.params._id)
+    const user = await userServices.deleteUser(req.params.id)
 
     if (!user) {
         return next(new AppError('Không tìm thấy tài khoản.', 404))
@@ -60,7 +60,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
 // ME
 exports.updateData = catchAsync(async (req, res, next) => {
-    const updatedUser = await userServices.updateData(req.user._id, req.body)
+    const updatedUser = await userServices.updateData(req.user.id, req.body)
 
     if (!updatedUser) {
         return next(new AppError('Không tìm thấy tài khoản.', 404))
@@ -75,7 +75,7 @@ exports.updateData = catchAsync(async (req, res, next) => {
 })
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
-    const deleteMe = await userServices.deleteUser(req.user._id)
+    const deleteMe = await userServices.deleteUser(req.user.id)
 
     if (!deleteMe) {
         return next(new AppError('Không tìm thấy tài khoản.', 404))

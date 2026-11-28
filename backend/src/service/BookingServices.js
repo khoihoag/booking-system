@@ -32,9 +32,9 @@ exports.createBooking = async (data) => {
 
     const bookedSlots = await exports.findBookingsByDateNpitchId(date, timeSlots[0].pitchId);
     const bookedSlotIds = new Set(bookedSlots.flatMap(booking =>
-        booking.timeSlotId.map(slot => String(slot._id || slot))
+        booking.timeSlotId.map(slot => String(slot.id || slot))
     ));
-    const unavailableSlot = timeSlots.find(slot => bookedSlotIds.has(String(slot._id)));
+    const unavailableSlot = timeSlots.find(slot => bookedSlotIds.has(String(slot.id)));
 
     if (unavailableSlot) {
         throw new AppError(

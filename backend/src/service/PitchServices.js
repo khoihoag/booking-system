@@ -1,4 +1,4 @@
-const pitchRepository = require('./../repository2/PitchRepository')
+const pitchRepository = require('./../repositories/PitchRepository')
 
 exports.createPitch = async (data) => {
     return pitchRepository.create(data)
@@ -13,7 +13,7 @@ exports.findByOwner = async (ownerId) => {
 }
 
 exports.findPitchById = async (id) => {
-    return pitchRepository.findOne({_id: id})
+    return pitchRepository.findOne({id: id})
 }
 
 exports.updatePitch = async (id, data) => {

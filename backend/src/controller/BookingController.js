@@ -5,7 +5,7 @@ const AppError = require('../utils/AppError')
 
 exports.createBooking = catchAsync(async (req, res, next) => {
     const bookingData = {
-        userId: req.user._id,
+        userId: req.user.id,
         timeSlotId: req.body.timeSlotId,
         date: req.body.date,
     }
@@ -52,7 +52,7 @@ exports.getAllBookings = catchAsync(async (req, res, next) => {
 })
 
 exports.getMyBookings = catchAsync(async (req, res, next) => {
-    const bookings = await bookingServices.getMyBookings(req.user._id)
+    const bookings = await bookingServices.getMyBookings(req.user.id)
 
     res.status(200).json({
         status: 'success',
@@ -62,15 +62,15 @@ exports.getMyBookings = catchAsync(async (req, res, next) => {
 })
 
 exports.getBookingById = catchAsync(async (req, res, next) => {
-    const bookingId = req.params.id || req.params._id
+    const bookingId = req.params.id
     const booking = await bookingServices.findBookingById(bookingId)
 
     if (!booking) {
         return next(new AppError('No booking found with that ID', 404))
     }
 
-    const bookingUserId = booking.userId?._id ? booking.userId._id.toString() : booking.userId?.toString()
-    const currentUserId = (req.user._id || req.user.id)?.toString()
+    const bookingUserId = booking.userId.id.toString()
+    const currentUserId = (req.user.id)?.toString()
     const isOwner = bookingUserId && currentUserId && bookingUserId === currentUserId
 
     if (!isOwner && req.user.role !== 'admin' && req.user.role !== 'pitch_owner') {
@@ -84,7 +84,7 @@ exports.getBookingById = catchAsync(async (req, res, next) => {
 })
 
 exports.updateBooking = catchAsync(async (req, res, next) => {
-    const bookingId = req.params.id || req.params._id
+    const bookingId = req.params.id
     const booking = await bookingServices.updateBooking(bookingId, req.body, req.user)
 
     if (!booking) {
@@ -98,7 +98,7 @@ exports.updateBooking = catchAsync(async (req, res, next) => {
 })
 
 exports.cancelBooking = catchAsync(async (req, res, next) => {
-    const bookingId = req.params.id || req.params._id
+    const bookingId = req.params.id
     const booking = await bookingLifecycleService.cancelBooking(bookingId, req.user)
 
     if (!booking) {

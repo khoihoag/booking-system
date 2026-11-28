@@ -1,4 +1,4 @@
-const userRepository = require('./../repository2/UserRepository')
+const userRepository = require('./../repositories/UserRepository')
 const AppError = require('../utils/AppError')
 
 const filterObj = (obj, ...allowedFields) => {

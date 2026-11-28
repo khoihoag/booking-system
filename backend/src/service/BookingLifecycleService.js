@@ -67,7 +67,7 @@ exports.completeFinishedBookings = async () => {
 
         const matchEnd = endTimes.sort((a, b) => b - a)[0]
         if (matchEnd && matchEnd <= now) {
-            await bookingRepository.update(booking._id, {
+            await bookingRepository.update(booking.id, {
                 status: 'completed',
                 completedAt: now
             })

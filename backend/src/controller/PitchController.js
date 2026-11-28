@@ -5,7 +5,7 @@ const AppError = require('./../utils/AppError')
 
 exports.createPitch = catchAsync(async (req, res) => {
     if (!req.body.ownerId && req.user) {
-        req.body.ownerId = req.user.id || req.user._id
+        req.body.ownerId = req.user.id
     }
     const pitch = await pitchServices.createPitch(req.body)
 
@@ -16,7 +16,7 @@ exports.createPitch = catchAsync(async (req, res) => {
 })
 
 exports.getPitchesByUser = catchAsync(async (req, res, next) => {
-    const ownerId = req.user._id || req.user.id
+    const ownerId = req.user.id
     const pitches = await pitchServices.findByOwner(ownerId)
 
     if (!pitches) {

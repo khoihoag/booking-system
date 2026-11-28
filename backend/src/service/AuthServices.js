@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs')
 const crypto = require("crypto");
 
 const AppError = require("../utils/AppError");
-const userRepository = require("./../repository2/UserRepository");
+const userRepository = require("./../repositories/UserRepository");
 const sendEmail = require("../utils/Email");
 
 const signToken = (id) => {

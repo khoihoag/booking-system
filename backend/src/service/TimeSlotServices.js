@@ -1,4 +1,4 @@
-const timeSlotRepository = require('./../repository2/TimeSlotRepository')
+const timeSlotRepository = require('./../repositories/TimeSlotRepository')
 const bookingServices = require('./BookingServices')
 
 exports.createTimeSlot = async (data) => {
@@ -17,12 +17,12 @@ exports.findPitchTimeSlotsByDate = async (pitchId, date) => {
     const timeSlots = await timeSlotRepository.findByPitchId(pitchId)
     const bookings = await bookingServices.findBookingsByDateNpitchId(date, pitchId)
     const bookedSet = new Set(bookings.flatMap(booking =>
-        booking.timeSlotId.map(slot => String(slot._id || slot))
+        booking.timeSlotId.map(slot => String(slot.id || slot))
     ))
 
     return timeSlots.map(slot => ({
         ...slot,
-        isBooked: bookedSet.has(slot._id.toString())
+        isBooked: bookedSet.has(slot.id.toString())
     }))
 
 }

@@ -37,7 +37,7 @@ export default function SignIn() {
       })
       
       const user = {
-        id: response.data.user._id,
+        id: response.data.user.id,
         email: response.data.user.email,
         name: response.data.user.name,
         role: response.data.user.role
