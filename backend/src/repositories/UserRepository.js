@@ -60,7 +60,7 @@ exports.findByEmail = async (email, selectPassword = false) => {
 
 exports.findByResetToken = async (hashedToken) => {
   const [result] = await pool.execute(
-    "SELECT * FROM users WHERE passwordResetToken = ? AND passwordResetExpries > NOW() LIMIT 1",
+    "SELECT * FROM users WHERE passwordResetToken = ? AND passwordResetExpires > NOW() LIMIT 1",
     [hashedToken],
   );
 
@@ -92,13 +92,13 @@ exports.update = async (id, data) => {
     (field) =>
       ({
         phone: "phoneNumber",
-        preferredType: "preferred_type",
-        preferredFoot: "preferred_foot",
-        jerseyNumber: "jersey_number",
-        twoFactorEnabled: "two_factor_enabled",
-        smsReminder: "sms_reminder",
-        zaloNotification: "zalo_notification",
-        promoAlerts: "promo_alerts",
+        preferredType: "preferredType",
+        preferredFoot: "preferredFoot",
+        jerseyNumber: "jerseyNumber",
+        twoFactorEnabled: "twoFactorEnabled",
+        smsReminder: "smsReminder",
+        zaloNotification: "zaloNotification",
+        promoAlerts: "promoAlerts",
       })[field] || field,
   );
   const [result] = await pool.execute(
@@ -126,7 +126,7 @@ exports.saveUser = async (user) => {
     "zaloNotification",
     "promoAlerts",
     "passwordResetToken",
-    "passwordResetExpries",
+    "passwordResetExpires",
   ];
   const updates = [];
   const values = [];

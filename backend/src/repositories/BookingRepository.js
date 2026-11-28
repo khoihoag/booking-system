@@ -3,7 +3,7 @@ const crypto = require("crypto");
 
 const load = async (where = "", params = []) => {
   const [rows] = await pool.execute(
-    `SELECT b.*, u.name AS user_name, u.email AS user_email, ts.id AS slot_id, ts.pitch_id, p.name AS pitch_name, p.address AS pitch_address FROM bookings b JOIN users u ON u.id = b.user_id LEFT JOIN booking_time_slots bts ON bts.booking_id = b.id LEFT JOIN time_slots ts ON ts.id = bts.time_slot_id LEFT JOIN pitches p ON p.id = ts.pitch_id ${where} ORDER BY b.booking_date DESC, b.created_at DESC`,
+    `SELECT b.*, u.name AS userName, u.email AS userEmail, ts.id AS slotId, ts.pitchId, p.name AS pitchName, p.address AS pitchAddress FROM bookings b JOIN users u ON u.id = b.userId LEFT JOIN bookingTimeSlots bts ON bts.bookingId = b.id LEFT JOIN timeSlots ts ON ts.id = bts.timeSlotId LEFT JOIN pitches p ON p.id = ts.pitchId ${where} ORDER BY b.bookingDate DESC, b.createdAt DESC`,
     params,
   );
   const result = new Map();
@@ -12,27 +12,27 @@ const load = async (where = "", params = []) => {
     if (!booking) {
       booking = {
         ...row,
-        _id: row.id,
-        userId: row.user_id,
-        expiresAt: row.expires_at,
-        paidAt: row.paid_at,
-        refundedAt: row.refunded_at,
-        completedAt: row.completed_at,
-        date: row.booking_date,
+        id: row.id,
+        userId: row.userId,
+        expiresAt: row.expiresAt,
+        paidAt: row.paidAt,
+        refundedAt: row.refundedAt,
+        completedAt: row.completedAt,
+        date: row.bookingDate,
         timeSlotId: [],
-        userId: { id: row.user_id, name: row.user_name, email: row.user_email },
+        userId: { id: row.userId, name: row.userName, email: row.userEmail },
       };
-      delete booking.slot_id;
+      delete booking.slotId;
       result.set(row.id, booking);
     }
-    if (row.slot_id)
+    if (row.slotId)
       booking.timeSlotId.push({
-        _id: row.slot_id,
-        pitchId: row.pitch_id,
+        id: row.slotId,
+        pitchId: row.pitchId,
         pitch: {
-          id: row.pitch_id,
-          name: row.pitch_name,
-          address: row.pitch_address,
+          id: row.pitchId,
+          name: row.pitchName,
+          address: row.pitchAddress,
         },
       });
   }
@@ -47,7 +47,7 @@ exports.create = async (data) => {
     await conn.beginTransaction();
     const bookingId = crypto.randomUUID();
     await conn.execute(
-      "INSERT INTO bookings (id, user_id, booking_date, status, expires_at) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO bookings (id, userId, bookingDate, status, expiresAt) VALUES (?, ?, ?, ?, ?)",
       [
         bookingId,
         data.userId,
@@ -58,7 +58,7 @@ exports.create = async (data) => {
     );
     for (const slotId of ids)
       await conn.execute(
-        "INSERT INTO booking_time_slots (booking_id, time_slot_id) VALUES (?, ?)",
+        "INSERT INTO bookingTimeSlots (bookingId, timeSlotId) VALUES (?, ?)",
         [bookingId, slotId],
       );
     await conn.commit();
@@ -76,15 +76,15 @@ exports.findAll = async (filter = {}) =>
     filter.status ? [filter.status] : [],
   );
 exports.findById = async (id) => (await load("WHERE b.id = ?", [id]))[0];
-exports.findByUser = async (userId) => load("WHERE b.user_id = ?", [userId]);
+exports.findByUser = async (userId) => load("WHERE b.userId = ?", [userId]);
 exports.findByPitchIdNDate = async (pitchId, date) =>
   load(
-    "WHERE b.booking_date = ? AND b.status <> 'cancelled' AND EXISTS (SELECT 1 FROM booking_time_slots x JOIN time_slots y ON y.id = x.time_slot_id WHERE x.booking_id = b.id AND y.pitch_id = ?)",
+    "WHERE b.bookingDate = ? AND b.status <> 'cancelled' AND EXISTS (SELECT 1 FROM bookingTimeSlots x JOIN timeSlots y ON y.id = x.timeSlotId WHERE x.bookingId = b.id AND y.pitchId = ?)",
     [date, pitchId],
   );
 exports.expirePending = async () => {
   const [r] = await pool.execute(
-    "UPDATE bookings SET status = 'cancelled' WHERE status = 'pending' AND expires_at <= NOW()",
+    "UPDATE bookings SET status = 'cancelled' WHERE status = 'pending' AND expiresAt <= NOW()",
   );
   return r;
 };
@@ -94,7 +94,7 @@ exports.update = async (id, data) => {
   );
   if (!fields.length) return exports.findById(id);
   const [r] = await pool.execute(
-    `UPDATE bookings SET ${fields.map((f) => `${({ paidAt: "paid_at", refundedAt: "refunded_at", completedAt: "completed_at", expiresAt: "expires_at" }[f] || f)} = ?`).join(", ")} WHERE id = ?`,
+    `UPDATE bookings SET ${fields.map((f) => `${f} = ?`).join(", ")} WHERE id = ?`,
     [...fields.map((f) => data[f]), id],
   );
   return r.affectedRows ? exports.findById(id) : null;

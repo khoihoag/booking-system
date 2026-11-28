@@ -29,7 +29,7 @@ const createResetPasswordToken = (user) => {
     const resetToken = crypto.randomBytes(32).toString('hex')
 
     user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
-    user.passwordResetExpries = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+    user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
 
     return resetToken
 }
@@ -130,7 +130,7 @@ exports.forgotPassword = async (email, protocol, host) => {
     });
   } catch (err) {
     user.passwordResetToken = null;
-    user.passwordResetExpries = null;
+    user.passwordResetExpires = null;
     await userRepository.saveUser(user);
 
     throw new AppError("Không thể gửi email. Vui lòng thử lại sau.", 500);
@@ -151,7 +151,7 @@ exports.resetPassword = async (token, password, password_confirm) => {
   user.password = password;
   user.password_confirm = password_confirm;
   user.passwordResetToken = null;
-  user.passwordResetExpries = null;
+  user.passwordResetExpires = null;
 
   await userRepository.saveUser(user);
 

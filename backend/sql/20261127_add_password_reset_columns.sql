@@ -84,23 +84,6 @@ CREATE TABLE pitchImages (
         ON DELETE CASCADE
 );
 
-CREATE TABLE pitchImages (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-
-    pitchId VARCHAR(36) NOT NULL,
-
-    imageUrl VARCHAR(500) NOT NULL,
-
-    isPrimary TINYINT(1) NOT NULL DEFAULT 0,
-
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fkPitchImagesPitch
-        FOREIGN KEY (pitchId)
-        REFERENCES pitches(id)
-        ON DELETE CASCADE
-);
-
 CREATE TABLE timeSlots (
     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
 
@@ -168,12 +151,29 @@ ON bookings(userId);
 CREATE INDEX idxBookingsBookingDate
 ON bookings(bookingDate);
 
+CREATE TABLE bookingTimeSlots (
+    bookingId VARCHAR(36) NOT NULL,
+    timeSlotId VARCHAR(36) NOT NULL,
+
+    PRIMARY KEY (bookingId, timeSlotId),
+
+    CONSTRAINT fkBookingTimeSlotsBooking
+        FOREIGN KEY (bookingId)
+        REFERENCES bookings(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fkBookingTimeSlotsTimeSlot
+        FOREIGN KEY (timeSlotId)
+        REFERENCES timeSlots(id)
+        ON DELETE CASCADE
+);
+
 
 ALTER TABLE users
   DROP COLUMN IF EXISTS password_reset_token,
   DROP COLUMN IF EXISTS password_reset_expires,
   ADD COLUMN IF NOT EXISTS passwordResetToken VARCHAR(255) NULL,
-  ADD COLUMN IF NOT EXISTS passwordResetExpries DATETIME NULL;
+  ADD COLUMN IF NOT EXISTS passwordResetExpires DATETIME NULL;
 
 
 ALTER TABLE pitches
